@@ -49,12 +49,23 @@ export default function Home() {
       } else if (e.key === "End") {
         e.preventDefault();
         scrollTo(1.0);
-      } else if (e.key === "PageDown" || e.key === " ") {
+      } else if (
+        e.key === "ArrowRight" ||
+        e.key === "ArrowDown" ||
+        e.key === "PageDown" ||
+        e.key === " "
+      ) {
         e.preventDefault();
-        scrollTo(Math.min(1.0, progress + 0.15));
-      } else if (e.key === "PageUp") {
+        const nextSpace = Math.min(6, Math.round(progress * 6) + 1);
+        scrollTo(nextSpace / 6);
+      } else if (
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowUp" ||
+        e.key === "PageUp"
+      ) {
         e.preventDefault();
-        scrollTo(Math.max(0.0, progress - 0.15));
+        const prevSpace = Math.max(0, Math.round(progress * 6) - 1);
+        scrollTo(prevSpace / 6);
       }
     };
 
@@ -129,10 +140,6 @@ export default function Home() {
         </button>
       </div>
 
-      {/* Invisible full-page scroll driver to allow natural mousewheel scrolling */}
-      <div className="fixed inset-0 pointer-events-none opacity-0">
-        <div style={{ height: "700vh" }} />
-      </div>
     </main>
   );
 }

@@ -19,13 +19,13 @@ interface ScreenSpacesContainerProps {
 }
 
 const SPACES = [
-  { id: "desktop", title: "Desktop", icon: Monitor, scrollProgress: 0.0 },
-  { id: "profile", title: "Profile", icon: User, scrollProgress: 0.18 },
-  { id: "tech", title: "Tech Stack", icon: Cpu, scrollProgress: 0.35 },
-  { id: "projects", title: "Projects", icon: Box, scrollProgress: 0.54 },
-  { id: "history", title: "History", icon: Clock, scrollProgress: 0.72 },
-  { id: "resume", title: "Resume", icon: FileText, scrollProgress: 0.86 },
-  { id: "contact", title: "Contact", icon: Mail, scrollProgress: 1.0 }
+  { id: "desktop", title: "Desktop", icon: Monitor, scrollProgress: 0 / 6 },
+  { id: "profile", title: "Profile", icon: User, scrollProgress: 1 / 6 },
+  { id: "tech", title: "Tech Stack", icon: Cpu, scrollProgress: 2 / 6 },
+  { id: "projects", title: "Projects", icon: Box, scrollProgress: 3 / 6 },
+  { id: "history", title: "History", icon: Clock, scrollProgress: 4 / 6 },
+  { id: "resume", title: "Resume", icon: FileText, scrollProgress: 5 / 6 },
+  { id: "contact", title: "Contact", icon: Mail, scrollProgress: 6 / 6 }
 ];
 
 export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
@@ -34,15 +34,11 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
   isZoomedIn = false,
   onToggleZoom
 }) => {
-  const { soundEnabled, playClick, playWindowOpen } = useSoundEffects();
-  const [activeSpace, setActiveSpace] = useState(0);
+  const { soundEnabled, playClick } = useSoundEffects();
   const [time, setTime] = useState("");
 
-  // Map scroll progress (0 to 1) to active virtual desktop space (0 to 6)
-  useEffect(() => {
-    const spaceIndex = Math.min(6, Math.floor(progress * 7));
-    setActiveSpace(spaceIndex);
-  }, [progress]);
+  // Continuous active space mapping (0 to 6)
+  const activeSpace = Math.max(0, Math.min(6, Math.round(progress * 6)));
 
   useEffect(() => {
     const updateTime = () => {
@@ -56,7 +52,6 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
   const handleNavigate = (idx: number) => {
     playClick();
-    setActiveSpace(idx);
     if (onScrollToProgress) {
       onScrollToProgress(SPACES[idx].scrollProgress);
     }
@@ -140,7 +135,7 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
       {/* ── MAIN VIRTUAL DESKTOP SPACES SLIDER ── */}
       <div className="relative flex-1 w-full overflow-hidden">
         <div
-          className="flex h-full w-[700%] transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)]"
+          className="flex h-full w-[700%] transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
           style={{ transform: `translateX(-${activeSpace * (100 / 7)}%)` }}
         >
           {/* Space 1: Desktop Boot */}
