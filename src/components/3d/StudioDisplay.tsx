@@ -4,7 +4,8 @@ import React, { useRef, useState, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
-import { useSoundEffects, audioEngine } from "@/hooks/useSoundEffects";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useMusicStore } from "@/hooks/useMusicStore";
 
 interface StudioDisplayProps {
   progress: number;
@@ -24,11 +25,10 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
   const {
     lightingMood,
     cameraView,
-    setCameraView,
-    isLofiPlaying,
-    toggleLofi
+    setCameraView
   } = useAtmosphereStore();
 
+  const { isPlaying: isMusicPlaying, togglePlay: toggleMusicPlay, setPlayerOpen } = useMusicStore();
   const { playThock, playMug } = useSoundEffects();
 
   const [keyDepressed, setKeyDepressed] = useState(false);
@@ -76,8 +76,8 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
       screenLightRef.current && (macbookLightRef.current.intensity = 0.6 + Math.sin(elapsed * 2.2) * 0.06);
     }
 
-    // 2. Speaker woofers bounce when Lofi is playing
-    const wooferBounce = isLofiPlaying ? Math.sin(elapsed * 14) * 0.012 : 0;
+    // 2. Speaker woofers bounce when music is playing
+    const wooferBounce = isMusicPlaying ? Math.sin(elapsed * 14) * 0.012 : 0;
     if (leftWooferRef.current) {
       leftWooferRef.current.position.z = 0.275 + wooferBounce;
     }
@@ -139,12 +139,8 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
 
   const handleSpeakerClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    toggleLofi();
-    if (!isLofiPlaying) {
-      audioEngine.startLofi();
-    } else {
-      audioEngine.stopLofi();
-    }
+    toggleMusicPlay();
+    setPlayerOpen(true);
   };
 
   // Color mappings based on lighting mood
@@ -372,10 +368,10 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
           <circleGeometry args={[0.035, 20]} />
           <meshBasicMaterial color="#090B10" />
         </mesh>
-        {/* Status LED: Green when Lofi is playing */}
+        {/* Status LED: Amber when Music is playing, Cyan on standby */}
         <mesh position={[0.17, -0.34, 0.275]}>
           <circleGeometry args={[0.007, 12]} />
-          <meshBasicMaterial color={isLofiPlaying ? "#34D399" : "#38BDF8"} />
+          <meshBasicMaterial color={isMusicPlaying ? "#F59E0B" : "#38BDF8"} />
         </mesh>
       </group>
 
@@ -413,7 +409,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
         </mesh>
         <mesh position={[-0.17, -0.34, 0.275]}>
           <circleGeometry args={[0.007, 12]} />
-          <meshBasicMaterial color={isLofiPlaying ? "#34D399" : "#38BDF8"} />
+          <meshBasicMaterial color={isMusicPlaying ? "#F59E0B" : "#38BDF8"} />
         </mesh>
       </group>
 

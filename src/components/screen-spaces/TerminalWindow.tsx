@@ -3,7 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Terminal, X, Minus, Square, Send } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
-import { useSoundEffects, audioEngine } from "@/hooks/useSoundEffects";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useMusicStore, PLAYLISTS } from "@/hooks/useMusicStore";
 
 interface TerminalLine {
   id: string;
@@ -12,8 +13,17 @@ interface TerminalLine {
 }
 
 export const TerminalWindow: React.FC = () => {
-  const { isTerminalOpen, setTerminalOpen, toggleLofi, isLofiPlaying } = useAtmosphereStore();
+  const { isTerminalOpen, setTerminalOpen } = useAtmosphereStore();
   const { playClick, playThock } = useSoundEffects();
+  const {
+    activePlaylist,
+    isPlaying,
+    togglePlay,
+    switchPlaylist,
+    triggerNext,
+    triggerPrev,
+    setPlayerOpen
+  } = useMusicStore();
 
   const [inputVal, setInputVal] = useState("");
   const [history, setHistory] = useState<TerminalLine[]>([
@@ -25,7 +35,7 @@ export const TerminalWindow: React.FC = () => {
     {
       id: "init-2",
       type: "system",
-      text: "Type 'help' to inspect available system commands or 'neofetch' for system info."
+      text: "Type 'help' to inspect available commands, or 'music' to control the Vinyl Player."
     }
   ]);
 
@@ -88,29 +98,29 @@ export const TerminalWindow: React.FC = () => {
       { id: String(Date.now()), type: "input", text: `chirag@tcs-node:~$ ${cmd}` }
     ];
 
-    switch (trimmed) {
-      case "help":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `AVAILABLE COMMANDS:
+    if (trimmed === "help") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `AVAILABLE COMMANDS:
   neofetch     - Display Chirag's engineering system specs
   skills       - Print verified technologies and frameworks
   blueprint    - Inspect flutter_blueprint (v3.0.0 on Pub.dev)
   repos        - List featured GitHub repositories (70 total)
   matrix       - Stream digital matrix telemetry
-  lofi         - Toggle ambient study chillhop audio
+  music        - Studio Vinyl Player (Old Songs & English Chill)
+  music next   - Skip to next track in playlist
+  music prev   - Return to previous track in playlist
+  music switch - Toggle between Retro Hindi & English Chill
   clear        - Clear terminal scrollback
   contact      - Direct email and LinkedIn endpoints
   exit         - Close terminal session`
-        });
-        break;
-
-      case "neofetch":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `      __                 chirag@tcs-workstation
+      });
+    } else if (trimmed === "neofetch") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `      __                 chirag@tcs-workstation
     /    \\               ----------------------
    | () () |             OS: ChiragOS v2.6 on Darwin x86_64
     \\  __ /              Host: Apple Studio Display 5K + MacBook Pro
@@ -120,103 +130,101 @@ export const TerminalWindow: React.FC = () => {
                          Flagship: flutter_blueprint on Pub.dev (20★)
                          Public Repos: 70 Repositories on GitHub
                          Shell: zsh 5.9 with Starship prompt
+                         Audio: Studio Vinyl Player (${PLAYLISTS[activePlaylist].name})
                          Uptime: 24/7 Production Ready`
-        });
-        break;
-
-      case "skills":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `STACK & ARCHITECTURES:
+      });
+    } else if (trimmed === "skills") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `STACK & ARCHITECTURES:
   Mobile:      Flutter, Dart, Android Native, iOS Native, BLoC, Riverpod, Provider, GetX
   Full-Stack:  NestJS, Node.js, TypeScript, React, Next.js (App Router, Turbopack)
   Databases:   PostgreSQL, MySQL, Firebase, Firestore, MongoDB, Redis
   DevOps & CI: Docker, GitHub Actions, Pub.dev Package Publishing, Linux`
-        });
-        break;
-
-      case "blueprint":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `PACKAGE: flutter_blueprint (v3.0.0)
+      });
+    } else if (trimmed === "blueprint") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `PACKAGE: flutter_blueprint (v3.0.0)
 Registry: https://pub.dev/packages/flutter_blueprint
 Stars:    20 GitHub Stars
 Overview: CLI generator to scaffold enterprise clean architecture apps in Flutter with
           pre-configured state management (BLoC/Riverpod/Provider/GetX) and CI pipelines.`
-        });
-        break;
-
-      case "repos":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `TOP REPOSITORIES (GitHub: @chirag640):
+      });
+    } else if (trimmed === "repos") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `TOP REPOSITORIES (GitHub: @chirag640):
   1. flutter_blueprint-Package   (20★) [Dart]    - Enterprise Flutter generator on Pub.dev
   2. FinFlow-Frontend            (6★)  [Dart]    - Personal & group finance mobile app
   3. FinFlow-Backend             (5★)  [TS]      - NestJS high-concurrency ledger service
   4. CollabStream                (4★)  [TS]      - Collaborative real-time canvas platform
   5. Flutter-splitWiseClone      (3★)  [Dart]    - Expense splitting with Firebase sync
   ... and 65 more public repositories.`
-        });
-        break;
-
-      case "matrix":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "matrix",
-          text: `01000011 01101000 01101001 01110010 01100001 01100111 
+      });
+    } else if (trimmed === "matrix") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "matrix",
+        text: `01000011 01101000 01101001 01110010 01100001 01100111 
 SYSTEM_OVERRIDE: ALL REPOSITORIES INJECTED. ENTERPRISE DEPLOYED.`
-        });
-        break;
-
-      case "lofi":
-      case "music":
-        toggleLofi();
-        if (!isLofiPlaying) {
-          audioEngine.startLofi();
-          newHistory.push({
-            id: String(Date.now() + 1),
-            type: "output",
-            text: "🎵 Lofi Chillhop Beats: PLAYING on studio audio monitors."
-          });
-        } else {
-          audioEngine.stopLofi();
-          newHistory.push({
-            id: String(Date.now() + 1),
-            type: "output",
-            text: "⏸️ Lofi Chillhop Beats: PAUSED."
-          });
-        }
-        break;
-
-      case "clear":
-        setHistory([]);
-        return;
-
-      case "contact":
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `CONTACT ENDPOINTS:
+      });
+    } else if (trimmed === "music next") {
+      triggerNext();
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `⏭️ Studio Player: Skipped to next track in ${PLAYLISTS[activePlaylist].name}.`
+      });
+    } else if (trimmed === "music prev") {
+      triggerPrev();
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `⏮️ Studio Player: Returning to previous track.`
+      });
+    } else if (trimmed === "music switch") {
+      const nextPlaylist = activePlaylist === "retro_hindi" ? "english_chill" : "retro_hindi";
+      switchPlaylist(nextPlaylist);
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `📻 Switched playlist to: ${PLAYLISTS[nextPlaylist].name} (${PLAYLISTS[nextPlaylist].badge}).`
+      });
+    } else if (trimmed === "music" || trimmed === "lofi" || trimmed === "song" || trimmed === "play") {
+      togglePlay();
+      setPlayerOpen(true);
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `🎵 Studio Vinyl Player: ${!isPlaying ? "PLAYING" : "PAUSED"}
+   Current Playlist: ${PLAYLISTS[activePlaylist].name}
+   Options: 'music next', 'music prev', 'music switch'`
+      });
+    } else if (trimmed === "clear") {
+      setHistory([]);
+      return;
+    } else if (trimmed === "contact") {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `CONTACT ENDPOINTS:
   Email:    chiragchaudhary1910@gmail.com
   LinkedIn: https://www.linkedin.com/in/chiragchaudhary1910/
   GitHub:   https://github.com/chirag640`
-        });
-        break;
-
-      case "exit":
-        setTerminalOpen(false);
-        return;
-
-      default:
-        newHistory.push({
-          id: String(Date.now() + 1),
-          type: "output",
-          text: `zsh: command not found: ${cmd}. Type 'help' to see valid commands.`
-        });
-        break;
+      });
+    } else if (trimmed === "exit") {
+      setTerminalOpen(false);
+      return;
+    } else {
+      newHistory.push({
+        id: String(Date.now() + 1),
+        type: "output",
+        text: `zsh: command not found: ${cmd}. Type 'help' to see valid commands.`
+      });
     }
 
     setHistory(newHistory);
@@ -236,6 +244,8 @@ SYSTEM_OVERRIDE: ALL REPOSITORIES INJECTED. ENTERPRISE DEPLOYED.`
 
   return (
     <div
+      data-terminal-window="true"
+      onWheel={(e) => e.stopPropagation()}
       style={{ left: `${position.x}px`, top: `${position.y}px` }}
       className="absolute z-50 w-full max-w-[620px] rounded-xl border border-white/20 bg-[#0B0F19]/95 backdrop-blur-2xl shadow-2xl overflow-hidden font-mono text-xs flex flex-col select-text"
     >

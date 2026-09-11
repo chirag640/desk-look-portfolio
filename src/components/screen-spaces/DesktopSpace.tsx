@@ -12,7 +12,7 @@ interface DesktopSpaceProps {
 
 export const DesktopSpace: React.FC<DesktopSpaceProps> = ({ onNavigateSpace }) => {
   return (
-    <div className="relative w-full h-full p-6 sm:p-10 flex flex-col justify-between select-none">
+    <div data-space-scroll="true" className="relative w-full h-full p-6 sm:p-10 flex flex-col justify-between select-none overflow-y-auto">
       {/* Top Welcome Banner */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

@@ -21,7 +21,7 @@ export const ProjectsSpace: React.FC = () => {
   const featuredProject = projectsData.find((p) => p.featured) || projectsData[0];
 
   return (
-    <div className="relative w-full h-full p-6 sm:p-10 flex flex-col justify-between select-none">
+    <div data-space-scroll="true" className="relative w-full h-full p-6 sm:p-10 flex flex-col justify-between select-none overflow-y-auto">
       {/* Space Title Header */}
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-2.5">

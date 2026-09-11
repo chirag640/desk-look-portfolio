@@ -9,8 +9,10 @@ import { HistorySpace } from "./HistorySpace";
 import { RepoResumeSpace } from "./RepoResumeSpace";
 import { ContactSpace } from "./ContactSpace";
 import { TerminalWindow } from "./TerminalWindow";
-import { useSoundEffects, audioEngine } from "@/hooks/useSoundEffects";
+import { MusicPopWidget } from "@/components/music/MusicPopWidget";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useAtmosphereStore, WallpaperTheme, LightingMood } from "@/hooks/useAtmosphereStore";
+import { useMusicStore, PLAYLISTS } from "@/hooks/useMusicStore";
 import {
   Monitor,
   User,
@@ -21,8 +23,7 @@ import {
   Mail,
   Volume2,
   VolumeX,
-  Music,
-  CloudRain,
+  Disc3,
   Sun,
   Moon,
   Sparkles,
@@ -58,12 +59,17 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
     setLightingMood,
     wallpaperTheme,
     setWallpaperTheme,
-    isLofiPlaying,
-    toggleLofi,
-    soundscape,
-    setSoundscape,
     toggleTerminal
   } = useAtmosphereStore();
+
+  const {
+    activePlaylist,
+    isPlaying,
+    togglePlay,
+    setPlayerOpen,
+    isMinimized,
+    toggleMinimize
+  } = useMusicStore();
 
   const [time, setTime] = useState("");
   const [showThemeMenu, setShowThemeMenu] = useState(false);
@@ -95,26 +101,11 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
     }
   };
 
-  const handleToggleLofi = () => {
+  const handleOpenMusic = () => {
     playClick();
-    toggleLofi();
-    if (!isLofiPlaying) {
-      audioEngine.startLofi();
-    } else {
-      audioEngine.stopLofi();
-    }
-  };
-
-  const handleToggleRain = () => {
-    playClick();
-    if (soundscape === "rain") {
-      audioEngine.stopRain();
-      setSoundscape("none");
-      setLightingMood("night");
-    } else {
-      audioEngine.startRain();
-      setSoundscape("rain");
-      setLightingMood("rain");
+    setPlayerOpen(true);
+    if (isMinimized) {
+      toggleMinimize();
     }
   };
 
@@ -144,42 +135,42 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
           <span className="text-white/20 hidden sm:inline">|</span>
 
-          {/* Lofi Chill Music Controller */}
-          <button
-            onClick={handleToggleLofi}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
-              isLofiPlaying
-                ? "bg-[#38BDF8]/20 border-[#38BDF8]/40 text-[#38BDF8]"
-                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
-            }`}
-            title="Toggle Relaxing Lofi Chillhop Beats"
-          >
-            <Music className="w-3 h-3" />
-            <span className="text-[10px] font-bold hidden md:inline">
-              {isLofiPlaying ? "Lofi Playing" : "Lofi Music"}
-            </span>
-            {isLofiPlaying && (
-              <span className="flex items-center gap-0.5 ml-1">
-                <span className="w-0.5 h-2.5 bg-[#38BDF8] animate-bounce" />
-                <span className="w-0.5 h-3 bg-[#38BDF8] animate-pulse" />
-                <span className="w-0.5 h-2 bg-[#38BDF8] animate-bounce" />
+          {/* Studio Vinyl Music Player Pill */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleOpenMusic}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+                isPlaying
+                  ? "bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-sm"
+                  : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+              }`}
+              title="Open Studio Vinyl Player (Old Hindi Songs & English Chill)"
+            >
+              <Disc3 className={`w-3.5 h-3.5 text-amber-400 ${isPlaying ? "animate-spin" : ""}`} />
+              <span className="text-[10px] font-bold hidden md:inline">
+                {activePlaylist === "retro_hindi" ? "Old Hindi Songs" : "English Chill"}
               </span>
-            )}
-          </button>
+              {isPlaying && (
+                <span className="flex items-center gap-0.5 ml-0.5">
+                  <span className="w-0.5 h-2 bg-amber-400 animate-bounce" />
+                  <span className="w-0.5 h-3 bg-amber-400 animate-pulse" />
+                  <span className="w-0.5 h-1.5 bg-amber-400 animate-bounce" />
+                </span>
+              )}
+            </button>
 
-          {/* Rain Soundscape Toggle */}
-          <button
-            onClick={handleToggleRain}
-            className={`flex items-center gap-1 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
-              soundscape === "rain"
-                ? "bg-[#60A5FA]/20 border-[#60A5FA]/40 text-[#60A5FA]"
-                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
-            }`}
-            title="Toggle Ambient Studio Rain"
-          >
-            <CloudRain className="w-3 h-3" />
-            <span className="text-[10px] hidden lg:inline">Rain ASMR</span>
-          </button>
+            {/* Quick Play/Pause Button */}
+            <button
+              onClick={() => {
+                playClick();
+                togglePlay();
+              }}
+              className="px-1.5 py-1 rounded-md bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white text-[10px] font-mono border border-white/10 transition-colors cursor-pointer"
+              title={isPlaying ? "Pause Music" : "Play Music"}
+            >
+              {isPlaying ? "⏸" : "▶"}
+            </button>
+          </div>
         </div>
 
         {/* Center: Mission Control Virtual Spaces Switcher */}
@@ -230,19 +221,12 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
                     onClick={() => {
                       playClick();
                       setLightingMood(m);
-                      if (m === "rain") {
-                        audioEngine.startRain();
-                        setSoundscape("rain");
-                      } else if (soundscape === "rain") {
-                        audioEngine.stopRain();
-                        setSoundscape("none");
-                      }
                     }}
                     className={`px-1.5 py-1 rounded text-[10px] capitalize font-mono transition-colors cursor-pointer ${
                       lightingMood === m ? "bg-[#38BDF8] text-black font-bold" : "bg-white/5 text-slate-300 hover:bg-white/10"
                     }`}
                   >
-                    {m === "night" ? "🌙 Night" : m === "golden" ? "☀️ Sunset" : "🌧️ Rain"}
+                    {m === "night" ? "🌙 Night" : m === "golden" ? "☀️ Sunset" : "🌧️ Moody"}
                   </button>
                 ))}
               </div>
@@ -321,43 +305,46 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           style={{ transform: `translateX(-${activeSpace * (100 / 7)}%)` }}
         >
           {/* Space 1: Desktop Boot */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={0}>
             <DesktopSpace onNavigateSpace={handleNavigate} />
           </div>
 
           {/* Space 2: Profile */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={1}>
             <ProfileSpace />
           </div>
 
           {/* Space 3: Tech Stack */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={2}>
             <TechSpace />
           </div>
 
           {/* Space 4: Projects (flutter_blueprint) */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={3}>
             <ProjectsSpace />
           </div>
 
           {/* Space 5: History */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={4}>
             <HistorySpace />
           </div>
 
           {/* Space 6: Resume & 70 Repos */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={5}>
             <RepoResumeSpace />
           </div>
 
           {/* Space 7: Contact */}
-          <div className="w-[14.2857%] h-full shrink-0">
+          <div className="w-[14.2857%] h-full shrink-0" data-space-index={6}>
             <ContactSpace onNavigateSpace={handleNavigate} />
           </div>
         </div>
 
         {/* ── DRAGGABLE INTERACTIVE TERMINAL WINDOW OVERLAY ── */}
         <TerminalWindow />
+
+        {/* ── STUDIO VINYL MUSIC PLAYER POPUP WIDGET ── */}
+        <MusicPopWidget />
       </div>
 
       {/* ── BOTTOM DOCK ── */}
@@ -392,6 +379,22 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           })}
 
           <div className="w-[1px] h-6 bg-white/20 mx-0.5" />
+
+          {/* Vinyl Music Player Launcher in Dock */}
+          <button
+            onClick={handleOpenMusic}
+            className={`group relative flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl transition-all cursor-pointer ${
+              isPlaying
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 -translate-y-0.5"
+                : "bg-white/5 text-slate-400 hover:text-white hover:bg-white/15 hover:-translate-y-0.5"
+            }`}
+            title="Studio Vinyl Player"
+          >
+            <Disc3 className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110 ${isPlaying ? "animate-spin" : ""}`} />
+            <span className="pointer-events-none absolute -top-8 px-2 py-0.5 text-[10px] font-mono text-white bg-black/90 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
+              Vinyl Player
+            </span>
+          </button>
 
           {/* Terminal Launcher in Dock */}
           <button
