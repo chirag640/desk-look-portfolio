@@ -8,8 +8,26 @@ import { ProjectsSpace } from "./ProjectsSpace";
 import { HistorySpace } from "./HistorySpace";
 import { RepoResumeSpace } from "./RepoResumeSpace";
 import { ContactSpace } from "./ContactSpace";
-import { useSoundEffects } from "@/hooks/useSoundEffects";
-import { Monitor, User, Cpu, Box, Clock, FileText, Mail, Volume2, VolumeX } from "lucide-react";
+import { TerminalWindow } from "./TerminalWindow";
+import { useSoundEffects, audioEngine } from "@/hooks/useSoundEffects";
+import { useAtmosphereStore, WallpaperTheme, LightingMood } from "@/hooks/useAtmosphereStore";
+import {
+  Monitor,
+  User,
+  Cpu,
+  Box,
+  Clock,
+  FileText,
+  Mail,
+  Volume2,
+  VolumeX,
+  Music,
+  CloudRain,
+  Sun,
+  Moon,
+  Sparkles,
+  Terminal as TerminalIcon
+} from "lucide-react";
 
 interface ScreenSpacesContainerProps {
   progress: number;
@@ -35,15 +53,35 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
   onToggleZoom
 }) => {
   const { soundEnabled, playClick } = useSoundEffects();
-  const [time, setTime] = useState("");
+  const {
+    lightingMood,
+    setLightingMood,
+    wallpaperTheme,
+    setWallpaperTheme,
+    isLofiPlaying,
+    toggleLofi,
+    soundscape,
+    setSoundscape,
+    toggleTerminal
+  } = useAtmosphereStore();
 
-  // Continuous active space mapping (0 to 6)
+  const [time, setTime] = useState("");
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
+
+  // Active space mapping (0 to 6)
   const activeSpace = Math.max(0, Math.min(6, Math.round(progress * 6)));
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      setTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }));
+      // Indian Standard Time (IST) display for Chirag's home location
+      const istTime = now.toLocaleTimeString("en-US", {
+        timeZone: "Asia/Kolkata",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true
+      });
+      setTime(`${istTime} IST`);
     };
     updateTime();
     const interval = setInterval(updateTime, 1000);
@@ -57,29 +95,95 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
     }
   };
 
+  const handleToggleLofi = () => {
+    playClick();
+    toggleLofi();
+    if (!isLofiPlaying) {
+      audioEngine.startLofi();
+    } else {
+      audioEngine.stopLofi();
+    }
+  };
+
+  const handleToggleRain = () => {
+    playClick();
+    if (soundscape === "rain") {
+      audioEngine.stopRain();
+      setSoundscape("none");
+      setLightingMood("night");
+    } else {
+      audioEngine.startRain();
+      setSoundscape("rain");
+      setLightingMood("rain");
+    }
+  };
+
+  // Background wallpapers
+  const wallpaperBg = {
+    obsidian: "bg-gradient-to-br from-[#0A0D14] via-[#0E131F] to-[#080B10]",
+    sakura: "bg-gradient-to-br from-[#160D1E] via-[#231330] to-[#0F0815]",
+    sonoma: "bg-gradient-to-br from-[#1E120A] via-[#2D1B10] to-[#120B05]",
+    nordic: "bg-gradient-to-br from-[#0C141F] via-[#132030] to-[#070D14]"
+  }[wallpaperTheme];
+
   return (
-    <div className="relative w-full h-full bg-[#0B0E14] text-white flex flex-col overflow-hidden select-none font-sans">
+    <div
+      className={`relative w-full h-full ${wallpaperBg} text-white flex flex-col overflow-hidden select-none font-sans transition-colors duration-700`}
+    >
       {/* ── TOP OS MENU BAR ── */}
-      <div className="h-10 px-4 flex items-center justify-between border-b border-white/10 bg-[#121620]/90 backdrop-blur-md z-40 text-xs font-mono">
+      <div className="h-10 px-3 sm:px-4 flex items-center justify-between border-b border-white/10 bg-[#121620]/90 backdrop-blur-md z-40 text-xs font-mono">
         {/* Left: Brand & Status */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#63C58A] animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#34D399] animate-pulse" />
             <span className="font-bold tracking-tight text-white">ChiragOS</span>
             <span className="text-[10px] text-slate-400 bg-white/10 px-1.5 py-0.5 rounded">
               v2.6
             </span>
           </div>
 
-          <span className="text-white/20">|</span>
+          <span className="text-white/20 hidden sm:inline">|</span>
 
-          <span className="hidden md:inline text-slate-300 font-sans">
-            Tata Consultancy Services (TCS) · Software Engineer
-          </span>
+          {/* Lofi Chill Music Controller */}
+          <button
+            onClick={handleToggleLofi}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+              isLofiPlaying
+                ? "bg-[#38BDF8]/20 border-[#38BDF8]/40 text-[#38BDF8]"
+                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+            }`}
+            title="Toggle Relaxing Lofi Chillhop Beats"
+          >
+            <Music className="w-3 h-3" />
+            <span className="text-[10px] font-bold hidden md:inline">
+              {isLofiPlaying ? "Lofi Playing" : "Lofi Music"}
+            </span>
+            {isLofiPlaying && (
+              <span className="flex items-center gap-0.5 ml-1">
+                <span className="w-0.5 h-2.5 bg-[#38BDF8] animate-bounce" />
+                <span className="w-0.5 h-3 bg-[#38BDF8] animate-pulse" />
+                <span className="w-0.5 h-2 bg-[#38BDF8] animate-bounce" />
+              </span>
+            )}
+          </button>
+
+          {/* Rain Soundscape Toggle */}
+          <button
+            onClick={handleToggleRain}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+              soundscape === "rain"
+                ? "bg-[#60A5FA]/20 border-[#60A5FA]/40 text-[#60A5FA]"
+                : "bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10"
+            }`}
+            title="Toggle Ambient Studio Rain"
+          >
+            <CloudRain className="w-3 h-3" />
+            <span className="text-[10px] hidden lg:inline">Rain ASMR</span>
+          </button>
         </div>
 
         {/* Center: Mission Control Virtual Spaces Switcher */}
-        <div className="flex items-center gap-1 bg-black/40 p-1 rounded-lg border border-white/10">
+        <div className="hidden sm:flex items-center gap-1 bg-black/40 p-1 rounded-lg border border-white/10">
           {SPACES.map((space, idx) => {
             const isActive = activeSpace === idx;
             return (
@@ -98,8 +202,82 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           })}
         </div>
 
-        {/* Right: Sound, Zoom toggle, Time */}
-        <div className="flex items-center gap-3">
+        {/* Right: Theme / Wallpaper / Zoom / Clock */}
+        <div className="flex items-center gap-2 sm:gap-3 relative">
+          {/* Theme & Wallpaper Selector Dropdown Toggle */}
+          <button
+            onClick={() => {
+              playClick();
+              setShowThemeMenu(!showThemeMenu);
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] transition-colors cursor-pointer"
+            title="Custom Wallpapers & Moods"
+          >
+            <Sparkles className="w-3 h-3 text-[#FBBF24]" />
+            <span className="hidden md:inline">Atmosphere</span>
+          </button>
+
+          {/* Dropdown Menu */}
+          {showThemeMenu && (
+            <div className="absolute top-10 right-14 w-52 p-2.5 rounded-xl bg-[#141A28]/95 border border-white/20 backdrop-blur-2xl shadow-2xl z-50 space-y-2 text-xs">
+              <div className="text-[10px] font-mono text-slate-400 font-bold uppercase">
+                Studio Lighting Mood
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                {(["night", "golden", "rain"] as LightingMood[]).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => {
+                      playClick();
+                      setLightingMood(m);
+                      if (m === "rain") {
+                        audioEngine.startRain();
+                        setSoundscape("rain");
+                      } else if (soundscape === "rain") {
+                        audioEngine.stopRain();
+                        setSoundscape("none");
+                      }
+                    }}
+                    className={`px-1.5 py-1 rounded text-[10px] capitalize font-mono transition-colors cursor-pointer ${
+                      lightingMood === m ? "bg-[#38BDF8] text-black font-bold" : "bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {m === "night" ? "🌙 Night" : m === "golden" ? "☀️ Sunset" : "🌧️ Rain"}
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-[10px] font-mono text-slate-400 font-bold uppercase pt-1">
+                Desktop Wallpaper
+              </div>
+              <div className="grid grid-cols-2 gap-1">
+                {(
+                  [
+                    { id: "obsidian", label: "🌑 Obsidian" },
+                    { id: "sakura", label: "🌸 Sakura" },
+                    { id: "sonoma", label: "🌅 Sonoma" },
+                    { id: "nordic", label: "❄️ Nordic" }
+                  ] as { id: WallpaperTheme; label: string }[]
+                ).map((w) => (
+                  <button
+                    key={w.id}
+                    onClick={() => {
+                      playClick();
+                      setWallpaperTheme(w.id);
+                    }}
+                    className={`px-1.5 py-1 rounded text-[10px] font-mono transition-colors cursor-pointer ${
+                      wallpaperTheme === w.id
+                        ? "bg-white text-black font-bold"
+                        : "bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {w.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {onToggleZoom && (
             <button
               onClick={() => {
@@ -121,11 +299,15 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
             className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors cursor-pointer"
             title={soundEnabled ? "Mute Sound" : "Enable Sound Effects"}
           >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-[#5B8DEF]" /> : <VolumeX className="w-3.5 h-3.5 text-slate-500" />}
+            {soundEnabled ? (
+              <Volume2 className="w-3.5 h-3.5 text-[#5B8DEF]" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 text-slate-500" />
+            )}
           </button>
 
           {time && (
-            <span className="text-slate-400 font-mono hidden sm:inline">
+            <span className="text-slate-400 font-mono hidden xl:inline">
               {time}
             </span>
           )}
@@ -173,6 +355,9 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
             <ContactSpace onNavigateSpace={handleNavigate} />
           </div>
         </div>
+
+        {/* ── DRAGGABLE INTERACTIVE TERMINAL WINDOW OVERLAY ── */}
+        <TerminalWindow />
       </div>
 
       {/* ── BOTTOM DOCK ── */}
@@ -205,6 +390,23 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
               </button>
             );
           })}
+
+          <div className="w-[1px] h-6 bg-white/20 mx-0.5" />
+
+          {/* Terminal Launcher in Dock */}
+          <button
+            onClick={() => {
+              playClick();
+              toggleTerminal();
+            }}
+            className="group relative flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#0284C7]/20 text-[#38BDF8] border border-[#38BDF8]/40 hover:bg-[#0284C7]/30 hover:-translate-y-0.5 transition-all cursor-pointer"
+            title="Open Interactive Terminal"
+          >
+            <TerminalIcon className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
+            <span className="pointer-events-none absolute -top-8 px-2 py-0.5 text-[10px] font-mono text-white bg-black/90 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
+              Terminal
+            </span>
+          </button>
         </div>
       </div>
     </div>

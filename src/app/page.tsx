@@ -6,6 +6,7 @@ import { ScreenSpacesContainer } from "@/components/screen-spaces/ScreenSpacesCo
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useResponsive } from "@/hooks/useMediaQuery";
 import { useSoundStore } from "@/hooks/useSoundEffects";
+import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { isWebGLAvailable } from "@/lib/webgl";
 import { WebGLFallbackNotice } from "@/ui/WebGLFallback";
 
@@ -24,7 +25,8 @@ export default function Home() {
   const { toggleSound } = useSoundStore();
   const [hasWebGL, setHasWebGL] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [isZoomedIn, setIsZoomedIn] = useState(true); // Default to immersive inside-the-screen view
+  const { cameraView, setCameraView } = useAtmosphereStore();
+  const isFocusedOnScreen = cameraView === "screen";
 
   useEffect(() => {
     setMounted(true);
@@ -42,7 +44,7 @@ export default function Home() {
       }
 
       if (e.key.toLowerCase() === "z") {
-        setIsZoomedIn((prev) => !prev);
+        setCameraView(cameraView === "screen" ? "desk" : "screen");
       } else if (e.key === "Home") {
         e.preventDefault();
         scrollTo(0.0);
@@ -71,11 +73,11 @@ export default function Home() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [progress, scrollTo]);
+  }, [progress, scrollTo, cameraView, setCameraView]);
 
   const handleToggleZoom = useCallback(() => {
-    setIsZoomedIn((prev) => !prev);
-  }, []);
+    setCameraView(cameraView === "screen" ? "desk" : "screen");
+  }, [cameraView, setCameraView]);
 
   return (
     <main className="relative w-full h-screen bg-[#0B0E14] overflow-hidden select-none font-sans">
@@ -83,7 +85,7 @@ export default function Home() {
       {mounted && hasWebGL && (
         <Experience3D
           progress={progress}
-          isZoomedIn={isZoomedIn}
+          isZoomedIn={isFocusedOnScreen}
           isMobile={isMobile}
           reducedMotion={prefersReducedMotion}
         />
@@ -95,9 +97,11 @@ export default function Home() {
       {/* ── 2. APPLE STUDIO DISPLAY FRAME & INSIDE-THE-SCREEN VIEWPORT ── */}
       <div
         className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-2 sm:p-6 md:p-8 ${
-          isZoomedIn
-            ? "scale-100 opacity-100"
-            : "scale-[0.82] translate-y-6 shadow-2xl opacity-95"
+          isFocusedOnScreen
+            ? "scale-100 opacity-100 pointer-events-auto"
+            : cameraView === "macbook"
+            ? "scale-[0.62] translate-x-44 translate-y-12 opacity-30 pointer-events-none"
+            : "scale-[0.78] translate-y-6 shadow-2xl opacity-90 pointer-events-auto"
         }`}
       >
         {/* Apple Studio Display Aluminum Monitor Bezel Frame */}
@@ -118,7 +122,7 @@ export default function Home() {
             <ScreenSpacesContainer
               progress={progress}
               onScrollToProgress={scrollTo}
-              isZoomedIn={isZoomedIn}
+              isZoomedIn={isFocusedOnScreen}
               onToggleZoom={handleToggleZoom}
             />
           </div>
@@ -136,7 +140,7 @@ export default function Home() {
           onClick={handleToggleZoom}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#131823]/90 hover:bg-[#1A2234] border border-white/15 text-xs font-mono text-slate-300 hover:text-white shadow-xl backdrop-blur-md transition-all cursor-pointer"
         >
-          <span>{isZoomedIn ? "View 3D Studio Desk [Z]" : "Zoom into Screen [Z]"}</span>
+          <span>{isFocusedOnScreen ? "View 3D Studio Desk [Z]" : "Zoom into Screen [Z]"}</span>
         </button>
       </div>
 
