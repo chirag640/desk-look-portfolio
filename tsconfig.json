@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/ui/*": ["./src/components/ui/*"],
+      "@/sections/*": ["./src/components/sections/*"],
+      "@/3d/*": ["./src/components/3d/*"]
     }
   },
   "include": [
