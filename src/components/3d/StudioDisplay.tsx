@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useMusicStore } from "@/hooks/useMusicStore";
+import { DeviceFrame } from "./DeviceFrame";
 
 interface StudioDisplayProps {
   progress: number;
@@ -13,7 +14,7 @@ interface StudioDisplayProps {
   isZoomedIn?: boolean;
 }
 
-export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }) => {
+export const StudioDisplay: React.FC<StudioDisplayProps> = ({ progress, isMobile = false }) => {
   const groupRef = useRef<THREE.Group>(null);
   const screenLightRef = useRef<THREE.PointLight>(null);
   const screenBarLightRef = useRef<THREE.PointLight>(null);
@@ -657,6 +658,9 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
           </mesh>
         </group>
       </group>
+
+      {/* ── 13. MAGSAFE IPHONE ON DESK STAND MIRRORING FLUTTER UI ── */}
+      <DeviceFrame progress={progress} isMobile={isMobile} />
     </group>
   );
 };

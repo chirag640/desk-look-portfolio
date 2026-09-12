@@ -60,11 +60,34 @@ interface AtmosphereState {
   isStickyNoteOpen: boolean;
   setStickyNoteOpen: (open: boolean) => void;
   toggleStickyNote: () => void;
+  isAutoSkySync: boolean;
+  toggleAutoSkySync: () => void;
+  setAutoSkySync: (val: boolean) => void;
 }
 
-export const useAtmosphereStore = create<AtmosphereState>((set) => ({
-  lightingMood: "night",
-  setLightingMood: (mood) => set({ lightingMood: mood }),
+export const getSunSyncMood = (): { mood: LightingMood; label: string } => {
+  try {
+    const now = new Date();
+    // Indian Standard Time for Chirag's Gandhinagar studio
+    const istString = now.toLocaleTimeString("en-US", { timeZone: "Asia/Kolkata", hour12: false, hour: "numeric" });
+    const hour = parseInt(istString, 10);
+    if (hour >= 5 && hour < 9) {
+      return { mood: "golden", label: "🌅 Dawn (IST)" };
+    } else if (hour >= 9 && hour < 17) {
+      return { mood: "night", label: "☀️ Daylight (IST)" };
+    } else if (hour >= 17 && hour < 20) {
+      return { mood: "golden", label: "🌇 Golden Hour (IST)" };
+    } else {
+      return { mood: "night", label: "🌙 Night (IST)" };
+    }
+  } catch {
+    return { mood: "night", label: "🌙 Night Studio" };
+  }
+};
+
+export const useAtmosphereStore = create<AtmosphereState>((set, get) => ({
+  lightingMood: getSunSyncMood().mood,
+  setLightingMood: (mood) => set({ lightingMood: mood, isAutoSkySync: false }),
   wallpaperTheme: "obsidian",
   setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
   cameraView: "screen",
@@ -81,5 +104,16 @@ export const useAtmosphereStore = create<AtmosphereState>((set) => ({
   setKeyboardSwitch: (sw) => set({ keyboardSwitch: sw }),
   isStickyNoteOpen: false,
   setStickyNoteOpen: (open) => set({ isStickyNoteOpen: open }),
-  toggleStickyNote: () => set((s) => ({ isStickyNoteOpen: !s.isStickyNoteOpen }))
+  toggleStickyNote: () => set((s) => ({ isStickyNoteOpen: !s.isStickyNoteOpen })),
+  isAutoSkySync: true,
+  toggleAutoSkySync: () => {
+    const next = !get().isAutoSkySync;
+    if (next) {
+      const sync = getSunSyncMood();
+      set({ isAutoSkySync: true, lightingMood: sync.mood });
+    } else {
+      set({ isAutoSkySync: false });
+    }
+  },
+  setAutoSkySync: (val) => set({ isAutoSkySync: val })
 }));

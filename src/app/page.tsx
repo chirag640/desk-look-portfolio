@@ -106,7 +106,7 @@ export default function Home() {
 
       {/* ── 2. APPLE STUDIO DISPLAY FRAME & INSIDE-THE-SCREEN VIEWPORT ── */}
       <div
-        className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] p-2 sm:p-6 md:p-8 ${
+        className={`absolute inset-0 z-20 flex items-center justify-center transition-[transform,opacity] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity] transform-gpu p-2 sm:p-6 md:p-8 ${
           isFocusedOnScreen
             ? "scale-100 opacity-100 pointer-events-auto"
             : cameraView === "macbook"

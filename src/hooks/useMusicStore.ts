@@ -50,6 +50,7 @@ interface MusicStoreState {
   isMuted: boolean;
   currentTrackTitle: string;
   userHasInteracted: boolean;
+  isTapeWarmth: boolean;
   
   // Actions
   togglePlay: () => void;
@@ -61,6 +62,7 @@ interface MusicStoreState {
   toggleVideoDrawer: () => void;
   setVolume: (vol: number) => void;
   toggleMute: () => void;
+  toggleTapeWarmth: () => void;
   setCurrentTrackTitle: (title: string) => void;
   setUserHasInteracted: (val: boolean) => void;
   
@@ -85,6 +87,7 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   isMuted: false,
   currentTrackTitle: "Vintage Bollywood Classics (70s-90s)",
   userHasInteracted: false,
+  isTapeWarmth: false,
 
   togglePlay: () => {
     const nextState = !get().isPlaying;
@@ -114,6 +117,7 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   
   setVolume: (vol) => set({ volume: Math.max(0, Math.min(100, vol)), isMuted: vol === 0 }),
   toggleMute: () => set((s) => ({ isMuted: !s.isMuted })),
+  toggleTapeWarmth: () => set((s) => ({ isTapeWarmth: !s.isTapeWarmth })),
   setCurrentTrackTitle: (title) => set({ currentTrackTitle: title }),
   setUserHasInteracted: (val) => set({ userHasInteracted: val }),
 

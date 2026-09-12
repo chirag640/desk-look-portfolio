@@ -11,7 +11,7 @@ import { ContactSpace } from "./ContactSpace";
 import { TerminalWindow } from "./TerminalWindow";
 import { MusicPopWidget } from "@/components/music/MusicPopWidget";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
-import { useAtmosphereStore, WallpaperTheme, LightingMood, KeyboardSwitchType, SWITCH_PROFILES } from "@/hooks/useAtmosphereStore";
+import { useAtmosphereStore, WallpaperTheme, LightingMood, KeyboardSwitchType, SWITCH_PROFILES, getSunSyncMood } from "@/hooks/useAtmosphereStore";
 import { useMusicStore, PLAYLISTS } from "@/hooks/useMusicStore";
 import {
   Monitor,
@@ -64,7 +64,9 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
     toggleTerminal,
     keyboardSwitch,
     setKeyboardSwitch,
-    toggleStickyNote
+    toggleStickyNote,
+    isAutoSkySync,
+    toggleAutoSkySync
   } = useAtmosphereStore();
 
   const {
@@ -247,7 +249,29 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
           {/* Dropdown Menu */}
           {showThemeMenu && (
-            <div className="absolute top-10 right-14 w-60 p-3 rounded-xl bg-[#141A28]/95 border border-white/20 backdrop-blur-2xl shadow-2xl z-50 space-y-2.5 text-xs">
+            <div className="absolute top-10 right-14 w-64 p-3 rounded-xl bg-[#141A28]/95 border border-white/20 backdrop-blur-2xl shadow-2xl z-50 space-y-2.5 text-xs">
+              {/* Real-Time Sun & Sky Synchronization Header */}
+              <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                <div className="flex items-center gap-1.5">
+                  <Sun className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[10px] font-mono text-slate-200 font-bold">Real-Time Sky Sync</span>
+                </div>
+                <button
+                  onClick={() => {
+                    playClick();
+                    toggleAutoSkySync();
+                  }}
+                  className={`px-2 py-0.5 rounded text-[9px] font-mono transition-colors cursor-pointer border ${
+                    isAutoSkySync
+                      ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 font-bold"
+                      : "bg-white/5 text-slate-400 border-white/10 hover:text-white"
+                  }`}
+                  title="Automatically synchronize studio sun lighting with Indian Standard Time"
+                >
+                  {isAutoSkySync ? `ON · ${getSunSyncMood().label}` : "OFF · Manual"}
+                </button>
+              </div>
+
               <div className="text-[10px] font-mono text-slate-400 font-bold uppercase">
                 Studio Lighting Mood
               </div>
@@ -361,8 +385,11 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
       {/* ── MAIN VIRTUAL DESKTOP SPACES SLIDER ── */}
       <div className="relative flex-1 w-full overflow-hidden">
         <div
-          className="flex h-full w-[700%] transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform"
-          style={{ transform: `translateX(-${activeSpace * (100 / 7)}%)` }}
+          className="flex h-full w-[700%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform transform-gpu"
+          style={{
+            transform: `translate3d(-${activeSpace * (100 / 7)}%, 0, 0)`,
+            backfaceVisibility: "hidden"
+          }}
         >
           {/* Space 1: Desktop Boot */}
           <div className="w-[14.2857%] h-full shrink-0" data-space-index={0}>

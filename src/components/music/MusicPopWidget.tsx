@@ -42,10 +42,12 @@ export const MusicPopWidget: React.FC = () => {
     setVolume,
     toggleMute,
     commandTrigger,
-    setUserHasInteracted
+    setUserHasInteracted,
+    isTapeWarmth,
+    toggleTapeWarmth
   } = useMusicStore();
 
-  const { playClick } = useSoundEffects();
+  const { playClick, startTapeWarmth, stopTapeWarmth } = useSoundEffects();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [playerReady, setPlayerReady] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -97,6 +99,16 @@ export const MusicPopWidget: React.FC = () => {
       postYTCommand("setVolume", [volume]);
     }
   }, [volume, isMuted]);
+
+  // Sync vintage tape hiss warmth
+  useEffect(() => {
+    if (isTapeWarmth && isPlaying) {
+      startTapeWarmth();
+    } else {
+      stopTapeWarmth();
+    }
+    return () => stopTapeWarmth();
+  }, [isTapeWarmth, isPlaying, startTapeWarmth, stopTapeWarmth]);
 
   // Listen to postMessage from YouTube iframe
   useEffect(() => {
@@ -441,22 +453,41 @@ export const MusicPopWidget: React.FC = () => {
             />
           </div>
 
-          {/* Toggle Video Drawer */}
-          <button
-            onClick={() => {
-              playClick();
-              toggleVideoDrawer();
-            }}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer ${
-              showVideoDrawer
-                ? "bg-white/20 text-white font-bold"
-                : "bg-white/5 text-slate-400 hover:text-white"
-            }`}
-            title="Toggle YouTube Video Frame"
-          >
-            <Tv className="w-3 h-3" />
-            <span>{showVideoDrawer ? "Hide Video" : "Video"}</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            {/* Vintage Analog Tape Hiss Warmth Toggle */}
+            <button
+              onClick={() => {
+                playClick();
+                toggleTapeWarmth();
+              }}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer border ${
+                isTapeWarmth
+                  ? "bg-amber-500/25 border-amber-500/50 text-amber-300 font-bold shadow-sm"
+                  : "bg-white/5 border-white/10 text-slate-400 hover:text-white"
+              }`}
+              title="Toggle Analog Tape Hiss & Vinyl Crackle Atmosphere"
+            >
+              <Radio className={`w-3 h-3 ${isTapeWarmth ? "text-amber-400 animate-pulse" : ""}`} />
+              <span>{isTapeWarmth ? "Tape Warmth" : "Tape Hiss"}</span>
+            </button>
+
+            {/* Toggle Video Drawer */}
+            <button
+              onClick={() => {
+                playClick();
+                toggleVideoDrawer();
+              }}
+              className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer ${
+                showVideoDrawer
+                  ? "bg-white/20 text-white font-bold"
+                  : "bg-white/5 text-slate-400 hover:text-white"
+              }`}
+              title="Toggle YouTube Video Frame"
+            >
+              <Tv className="w-3 h-3" />
+              <span>{showVideoDrawer ? "Hide Video" : "Video"}</span>
+            </button>
+          </div>
         </div>
       </div>
 

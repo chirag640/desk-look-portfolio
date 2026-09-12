@@ -20,6 +20,9 @@ class AudioEngine {
   private rainNode: AudioNode | null = null;
   private lofiInterval: NodeJS.Timeout | null = null;
   private activeLofiNodes: OscillatorNode[] = [];
+  private tapeHissSource: AudioBufferSourceNode | null = null;
+  private tapeHissGain: GainNode | null = null;
+  private tapeCrackleInterval: NodeJS.Timeout | null = null;
 
   private getContext(): AudioContext | null {
     if (typeof window === "undefined") return null;
@@ -302,6 +305,102 @@ class AudioEngine {
     });
     this.activeLofiNodes = [];
   }
+
+  startTapeWarmth() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    this.stopTapeWarmth();
+
+    try {
+      const bufferSize = ctx.sampleRate * 3;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        data[i] = (b0 + b1 + b2) * 0.11;
+      }
+
+      const noiseSource = ctx.createBufferSource();
+      noiseSource.buffer = buffer;
+      noiseSource.loop = true;
+
+      const bandpass = ctx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.setValueAtTime(2200, ctx.currentTime);
+      bandpass.Q.setValueAtTime(0.75, ctx.currentTime);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.001, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 1.2);
+
+      noiseSource.connect(bandpass);
+      bandpass.connect(gain);
+      gain.connect(ctx.destination);
+
+      noiseSource.start();
+      this.tapeHissSource = noiseSource;
+      this.tapeHissGain = gain;
+
+      const playCracklePop = () => {
+        const curCtx = this.getContext();
+        if (!curCtx) return;
+        try {
+          const t = curCtx.currentTime;
+          const osc = curCtx.createOscillator();
+          const popGain = curCtx.createGain();
+          const popFilter = curCtx.createBiquadFilter();
+
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(3200 + Math.random() * 2400, t);
+          popFilter.type = "highpass";
+          popFilter.frequency.setValueAtTime(2500, t);
+
+          const vol = 0.012 + Math.random() * 0.024;
+          popGain.gain.setValueAtTime(vol, t);
+          popGain.gain.exponentialRampToValueAtTime(0.0001, t + 0.015);
+
+          osc.connect(popFilter);
+          popFilter.connect(popGain);
+          popGain.connect(curCtx.destination);
+
+          osc.start(t);
+          osc.stop(t + 0.02);
+        } catch {}
+      };
+
+      this.tapeCrackleInterval = setInterval(() => {
+        if (Math.random() > 0.35) {
+          playCracklePop();
+        }
+      }, 550);
+    } catch {}
+  }
+
+  stopTapeWarmth() {
+    if (this.tapeCrackleInterval) {
+      clearInterval(this.tapeCrackleInterval);
+      this.tapeCrackleInterval = null;
+    }
+    if (this.tapeHissGain && this.ctx) {
+      try {
+        this.tapeHissGain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.4);
+      } catch {}
+    }
+    setTimeout(() => {
+      if (this.tapeHissSource) {
+        try {
+          this.tapeHissSource.stop();
+          this.tapeHissSource.disconnect();
+        } catch {}
+        this.tapeHissSource = null;
+      }
+      this.tapeHissGain = null;
+    }, 450);
+  }
 }
 
 export const audioEngine = new AudioEngine();
@@ -334,12 +433,22 @@ export function useSoundEffects() {
     audioEngine.playPaperRustle();
   };
 
+  const startTapeWarmth = () => {
+    audioEngine.startTapeWarmth();
+  };
+
+  const stopTapeWarmth = () => {
+    audioEngine.stopTapeWarmth();
+  };
+
   return {
     playClick,
     playWindowOpen,
     playThock,
     playMug,
     playPaperRustle,
+    startTapeWarmth,
+    stopTapeWarmth,
     soundEnabled
   };
 }

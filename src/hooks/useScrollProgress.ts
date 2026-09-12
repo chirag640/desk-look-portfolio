@@ -112,7 +112,8 @@ export function useScrollProgress() {
       const delta =
         Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
 
-      if (Math.abs(delta) > 18) {
+      // Threshold check with smooth gesture cooldown
+      if (Math.abs(delta) > 22) {
         isThrottledRef.current = true;
 
         if (delta > 0) {
@@ -121,9 +122,10 @@ export function useScrollProgress() {
           prevSpace();
         }
 
+        // Clean, responsive transition window (260ms matches hardware acceleration)
         setTimeout(() => {
           isThrottledRef.current = false;
-        }, 460);
+        }, 280);
       }
     };
 

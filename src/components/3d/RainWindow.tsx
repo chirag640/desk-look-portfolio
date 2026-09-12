@@ -93,13 +93,12 @@ export const RainWindow: React.FC = () => {
       {/* Glass Pane Cutout / Translucent Window Glass */}
       <mesh position={[0, 0.2, 0.005]}>
         <planeGeometry args={[8.5, 4.3]} />
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           color={isRainy ? "#7DD3FC" : "#38BDF8"}
           transparent
           opacity={isRainy ? 0.22 : 0.08}
-          roughness={0.08}
-          metalness={0.1}
-          transmission={0.7}
+          roughness={0.1}
+          metalness={0.2}
         />
       </mesh>
 
