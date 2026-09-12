@@ -7,6 +7,7 @@ export type PlaylistId = "retro_hindi" | "english_chill";
 export interface PlaylistInfo {
   id: PlaylistId;
   youtubePlaylistId: string;
+  seedVideoId?: string;
   name: string;
   subtitle: string;
   genre: string;
@@ -29,6 +30,7 @@ export const PLAYLISTS: Record<PlaylistId, PlaylistInfo> = {
   english_chill: {
     id: "english_chill",
     youtubePlaylistId: "PL_iDgCGOAYHPgBh1nzIdTSGNdFhpmuiRL",
+    seedVideoId: "zG5YzRxOcsI",
     name: "English Melodic Chill",
     subtitle: "Acoustic Pop, Soft Melodies & Cozy Chill Hits",
     genre: "English Melodic Chill",

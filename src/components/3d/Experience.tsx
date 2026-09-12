@@ -5,6 +5,7 @@ import { Canvas } from "@react-three/fiber";
 import { CameraRig } from "./CameraRig";
 import { StudioEnvironment } from "./Environment";
 import { StudioDisplay } from "./StudioDisplay";
+import { RainWindow } from "./RainWindow";
 import * as THREE from "three";
 
 interface ExperienceProps {
@@ -47,6 +48,7 @@ export const Experience: React.FC<ExperienceProps> = ({
             isZoomedIn={isZoomedIn}
           />
           <StudioEnvironment isMobile={isMobile} />
+          <RainWindow />
           <StudioDisplay
             progress={progress}
             isMobile={isMobile}

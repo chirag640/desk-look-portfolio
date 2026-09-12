@@ -6,6 +6,39 @@ export type LightingMood = "night" | "golden" | "rain";
 export type WallpaperTheme = "obsidian" | "sakura" | "sonoma" | "nordic";
 export type CameraViewMode = "screen" | "desk" | "macbook";
 export type SoundscapeType = "none" | "rain" | "lofi" | "study";
+export type KeyboardSwitchType = "boba_u4t" | "gateron_yellow" | "cherry_blue";
+
+export interface SwitchProfileInfo {
+  id: KeyboardSwitchType;
+  name: string;
+  type: string;
+  color: string;
+  soundDescription: string;
+}
+
+export const SWITCH_PROFILES: Record<KeyboardSwitchType, SwitchProfileInfo> = {
+  boba_u4t: {
+    id: "boba_u4t",
+    name: "Gazzew Boba U4T",
+    type: "Tactile",
+    color: "#D97706",
+    soundDescription: "Deep Acoustic Thock"
+  },
+  gateron_yellow: {
+    id: "gateron_yellow",
+    name: "Gateron Milky Yellow Pro",
+    type: "Linear",
+    color: "#EAB308",
+    soundDescription: "Creamy Smooth Pop"
+  },
+  cherry_blue: {
+    id: "cherry_blue",
+    name: "Cherry MX Blue",
+    type: "Clicky",
+    color: "#0284C7",
+    soundDescription: "Crisp Tactile Click"
+  }
+};
 
 interface AtmosphereState {
   lightingMood: LightingMood;
@@ -22,6 +55,11 @@ interface AtmosphereState {
   isTerminalOpen: boolean;
   setTerminalOpen: (open: boolean) => void;
   toggleTerminal: () => void;
+  keyboardSwitch: KeyboardSwitchType;
+  setKeyboardSwitch: (sw: KeyboardSwitchType) => void;
+  isStickyNoteOpen: boolean;
+  setStickyNoteOpen: (open: boolean) => void;
+  toggleStickyNote: () => void;
 }
 
 export const useAtmosphereStore = create<AtmosphereState>((set) => ({
@@ -38,5 +76,10 @@ export const useAtmosphereStore = create<AtmosphereState>((set) => ({
   setLofiPlaying: (val) => set({ isLofiPlaying: val }),
   isTerminalOpen: false,
   setTerminalOpen: (open) => set({ isTerminalOpen: open }),
-  toggleTerminal: () => set((s) => ({ isTerminalOpen: !s.isTerminalOpen }))
+  toggleTerminal: () => set((s) => ({ isTerminalOpen: !s.isTerminalOpen })),
+  keyboardSwitch: "boba_u4t",
+  setKeyboardSwitch: (sw) => set({ keyboardSwitch: sw }),
+  isStickyNoteOpen: false,
+  setStickyNoteOpen: (open) => set({ isStickyNoteOpen: open }),
+  toggleStickyNote: () => set((s) => ({ isStickyNoteOpen: !s.isStickyNoteOpen }))
 }));

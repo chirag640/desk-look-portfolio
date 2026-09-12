@@ -9,6 +9,8 @@ import { useSoundStore } from "@/hooks/useSoundEffects";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { isWebGLAvailable } from "@/lib/webgl";
 import { WebGLFallbackNotice } from "@/ui/WebGLFallback";
+import { StickyNoteModal } from "@/components/desk-elements/StickyNoteModal";
+import { MacBookScreenContent } from "@/components/macbook/MacBookScreenContent";
 
 // Client-only dynamic 3D Canvas
 const Experience3D = dynamic(
@@ -44,7 +46,11 @@ export default function Home() {
       }
 
       if (e.key.toLowerCase() === "z") {
-        setCameraView(cameraView === "screen" ? "desk" : "screen");
+        if (cameraView === "macbook") {
+          setCameraView("screen");
+        } else {
+          setCameraView(cameraView === "screen" ? "desk" : "screen");
+        }
       } else if (e.key === "Home") {
         e.preventDefault();
         scrollTo(0.0);
@@ -76,7 +82,11 @@ export default function Home() {
   }, [progress, scrollTo, cameraView, setCameraView]);
 
   const handleToggleZoom = useCallback(() => {
-    setCameraView(cameraView === "screen" ? "desk" : "screen");
+    if (cameraView === "macbook") {
+      setCameraView("screen");
+    } else {
+      setCameraView(cameraView === "screen" ? "desk" : "screen");
+    }
   }, [cameraView, setCameraView]);
 
   return (
@@ -134,16 +144,43 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Floating View Switcher Button */}
-      <div className="fixed bottom-3 right-4 z-40">
+      {/* Floating View Switcher & Sidecar Quick Launcher Buttons */}
+      <div className="fixed bottom-3 right-4 z-40 flex items-center gap-2">
+        {/* MacBook Sidecar Quick Jump Button */}
+        <button
+          onClick={() => {
+            setCameraView(cameraView === "macbook" ? "screen" : "macbook");
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl backdrop-blur-md transition-all cursor-pointer ${
+            cameraView === "macbook"
+              ? "bg-[#0284C7]/30 border-[#38BDF8] text-[#38BDF8]"
+              : "bg-[#131823]/90 hover:bg-[#1A2234] border-white/15 text-slate-300 hover:text-white"
+          }`}
+          title="Open MacBook Pro M3 Sidecar Playground"
+        >
+          <span>💻 Sidecar [Dart & GitHub]</span>
+        </button>
+
+        {/* View Zoom Switcher Button */}
         <button
           onClick={handleToggleZoom}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#131823]/90 hover:bg-[#1A2234] border border-white/15 text-xs font-mono text-slate-300 hover:text-white shadow-xl backdrop-blur-md transition-all cursor-pointer"
         >
-          <span>{isFocusedOnScreen ? "View 3D Studio Desk [Z]" : "Zoom into Screen [Z]"}</span>
+          <span>
+            {cameraView === "macbook"
+              ? "Return to Screen [Z]"
+              : isFocusedOnScreen
+              ? "View 3D Studio Desk [Z]"
+              : "Zoom into Screen [Z]"}
+          </span>
         </button>
       </div>
 
+      {/* ── 3. 3M YELLOW STICKY NOTE MODAL SCRATCHPAD ── */}
+      <StickyNoteModal />
+
+      {/* ── 4. MACBOOK PRO SIDECAR LIVE CODE & GITHUB MODAL ── */}
+      <MacBookScreenContent />
     </main>
   );
 }

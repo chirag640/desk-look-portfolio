@@ -25,11 +25,14 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
   const {
     lightingMood,
     cameraView,
-    setCameraView
+    setCameraView,
+    keyboardSwitch,
+    setKeyboardSwitch,
+    setStickyNoteOpen
   } = useAtmosphereStore();
 
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusicPlay, setPlayerOpen } = useMusicStore();
-  const { playThock, playMug } = useSoundEffects();
+  const { playClick, playThock, playMug, playPaperRustle } = useSoundEffects();
 
   const [keyDepressed, setKeyDepressed] = useState(false);
   const [steamPuff, setSteamPuff] = useState(0);
@@ -125,7 +128,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
 
   const handleKeyboardClick = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    playThock();
+    playThock(keyboardSwitch);
     setKeyDepressed(true);
     setTimeout(() => setKeyDepressed(false), 110);
   };
@@ -496,6 +499,163 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({ isMobile = false }
           <boxGeometry args={[0.025, 0.04, 0.09]} />
           <meshStandardMaterial color="#1E293B" roughness={0.4} />
         </mesh>
+      </group>
+
+      {/* ── 10. 3M YELLOW STICKY NOTE ON DESK (CLICK TO OPEN SCRATCHPAD) ── */}
+      <group
+        position={[1.36, -0.575, 0.42]}
+        rotation={[-Math.PI / 2, 0, 0.18]}
+        onClick={(e) => {
+          e.stopPropagation();
+          playPaperRustle();
+          setStickyNoteOpen(true);
+        }}
+      >
+        {/* Yellow Paper Note */}
+        <mesh castShadow receiveShadow>
+          <planeGeometry args={[0.24, 0.24]} />
+          <meshStandardMaterial
+            color="#FEF08A"
+            roughness={0.88}
+            metalness={0.0}
+            polygonOffset
+            polygonOffsetFactor={-1}
+          />
+        </mesh>
+        {/* Translucent Frosted Tape at Top */}
+        <mesh position={[0, 0.11, 0.002]}>
+          <planeGeometry args={[0.11, 0.032]} />
+          <meshBasicMaterial color="#FFFFFF" transparent opacity={0.65} />
+        </mesh>
+        {/* Dog-eared slight corner fold */}
+        <mesh position={[0.09, -0.09, 0.001]} rotation={[0, 0, 0.25]}>
+          <planeGeometry args={[0.035, 0.035]} />
+          <meshBasicMaterial color="#EAB308" />
+        </mesh>
+      </group>
+
+      {/* ── 11. MECHANICAL KEYBOARD ACOUSTIC SWITCH PROFILE TOGGLE ── */}
+      <group
+        position={[-0.88, -0.565, 0.52]}
+        onClick={(e) => {
+          e.stopPropagation();
+          const next =
+            keyboardSwitch === "boba_u4t"
+              ? "gateron_yellow"
+              : keyboardSwitch === "gateron_yellow"
+              ? "cherry_blue"
+              : "boba_u4t";
+          setKeyboardSwitch(next);
+          playThock(next);
+        }}
+      >
+        {/* Toggle Housing Base */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[0.18, 0.024, 0.1]} />
+          <meshStandardMaterial color="#0F172A" roughness={0.3} metalness={0.8} />
+        </mesh>
+        {/* Switch Slider Button */}
+        <mesh
+          position={[
+            keyboardSwitch === "cherry_blue" ? -0.048 : keyboardSwitch === "gateron_yellow" ? 0 : 0.048,
+            0.016,
+            0
+          ]}
+          castShadow
+        >
+          <boxGeometry args={[0.042, 0.02, 0.07]} />
+          <meshStandardMaterial
+            color={
+              keyboardSwitch === "cherry_blue"
+                ? "#0284C7"
+                : keyboardSwitch === "gateron_yellow"
+                ? "#EAB308"
+                : "#D97706"
+            }
+            roughness={0.2}
+            metalness={0.6}
+          />
+        </mesh>
+        {/* Glow LED Indicator */}
+        <mesh position={[0, 0.014, -0.035]}>
+          <circleGeometry args={[0.007, 12]} />
+          <meshBasicMaterial
+            color={
+              keyboardSwitch === "cherry_blue"
+                ? "#38BDF8"
+                : keyboardSwitch === "gateron_yellow"
+                ? "#FDE047"
+                : "#F59E0B"
+            }
+          />
+        </mesh>
+      </group>
+
+      {/* ── 12. 3D MACBOOK PRO SIDECAR LAPTOP ON DESK ── */}
+      <group
+        position={[-2.05, -0.565, 0.08]}
+        rotation={[0, 0.28, 0]}
+        onClick={(e) => {
+          e.stopPropagation();
+          playClick();
+          setCameraView(cameraView === "macbook" ? "screen" : "macbook");
+        }}
+      >
+        {/* Laptop Aluminum Lower Chassis Base */}
+        <mesh castShadow receiveShadow>
+          <boxGeometry args={[0.74, 0.02, 0.52]} />
+          <meshStandardMaterial color="#1E2430" roughness={0.3} metalness={0.8} />
+        </mesh>
+
+        {/* Keyboard Well */}
+        <mesh position={[0, 0.011, -0.06]}>
+          <boxGeometry args={[0.64, 0.004, 0.28]} />
+          <meshStandardMaterial color="#0B0F19" roughness={0.7} />
+        </mesh>
+
+        {/* Individual Key Row Accents */}
+        <mesh position={[0, 0.013, -0.06]}>
+          <planeGeometry args={[0.62, 0.26]} />
+          <meshStandardMaterial color="#182030" roughness={0.6} />
+        </mesh>
+
+        {/* Force Touch Trackpad */}
+        <mesh position={[0, 0.011, 0.14]}>
+          <boxGeometry args={[0.22, 0.002, 0.15]} />
+          <meshStandardMaterial color="#232B3E" roughness={0.35} metalness={0.5} />
+        </mesh>
+
+        {/* Open Display Lid (Hinged at back) */}
+        <group position={[0, 0.01, -0.26]} rotation={[-0.28, 0, 0]}>
+          {/* Display Aluminum Enclosure Back */}
+          <mesh position={[0, 0.23, 0]} castShadow>
+            <boxGeometry args={[0.74, 0.46, 0.012]} />
+            <meshStandardMaterial color="#1E2430" roughness={0.3} metalness={0.8} />
+          </mesh>
+
+          {/* Glowing Retina Display Screen (Live Code Preview Indicator) */}
+          <mesh position={[0, 0.23, 0.007]}>
+            <planeGeometry args={[0.7, 0.42]} />
+            <meshBasicMaterial color="#0B132B" />
+          </mesh>
+
+          {/* Emissive Code Lines on Screen */}
+          <mesh position={[0, 0.23, 0.008]}>
+            <planeGeometry args={[0.64, 0.36]} />
+            <meshStandardMaterial
+              color="#0284C7"
+              emissive="#0284C7"
+              emissiveIntensity={0.65}
+              roughness={0.2}
+            />
+          </mesh>
+
+          {/* Display Notch */}
+          <mesh position={[0, 0.43, 0.009]}>
+            <planeGeometry args={[0.08, 0.018]} />
+            <meshBasicMaterial color="#000000" />
+          </mesh>
+        </group>
       </group>
     </group>
   );

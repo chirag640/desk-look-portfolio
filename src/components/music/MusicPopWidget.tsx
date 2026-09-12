@@ -467,31 +467,42 @@ export const MusicPopWidget: React.FC = () => {
         }`}
       >
         <div className="w-full h-[185px]">
-          {/* Note: IFrame is kept permanently mounted in the host container below so audio never drops */}
+          {/* Video drawer frame space */}
         </div>
       </div>
 
       {/* ── PERMANENT BACKGROUND YOUTUBE HOST CONTAINER ── */}
       {/* 
-        This iframe stays permanently in the DOM so that audio playback never stops 
-        when switching spaces, dragging windows, or toggling popups.
+        This iframe stays permanently in the viewport with valid dimensions (320x180)
+        so browser/YouTube anti-background policies never pause the audio.
       */}
       <div
         className={`fixed transition-all duration-300 z-10 ${
           showVideoDrawer
-            ? "bottom-[84px] right-4 sm:right-8 w-[320px] sm:w-[350px] h-[185px] pointer-events-auto opacity-100"
-            : "top-[-9999px] left-[-9999px] w-1 h-1 pointer-events-none opacity-0"
+            ? "bottom-[84px] right-4 sm:right-8 w-[320px] sm:w-[350px] h-[185px] pointer-events-auto opacity-100 shadow-2xl"
+            : "bottom-20 right-4 sm:right-8 w-[320px] sm:w-[350px] h-[185px] pointer-events-none opacity-[0.005] -z-10"
         }`}
       >
         <iframe
           ref={iframeRef}
+          key={activePlaylist}
           id="chirag-studio-youtube-player"
-          src={`https://www.youtube.com/embed/videoseries?list=${currentPlaylist.youtubePlaylistId}&enablejsapi=1&autoplay=1&origin=${
-            typeof window !== "undefined" ? window.location.origin : ""
-          }`}
+          src={
+            currentPlaylist.seedVideoId
+              ? `https://www.youtube.com/embed/${currentPlaylist.seedVideoId}?list=${currentPlaylist.youtubePlaylistId}&enablejsapi=1&autoplay=1`
+              : `https://www.youtube.com/embed/videoseries?list=${currentPlaylist.youtubePlaylistId}&enablejsapi=1&autoplay=1`
+          }
           allow="autoplay; encrypted-media; picture-in-picture"
           className="w-full h-full border-0 rounded-b-2xl"
           title="Chirag OS Studio Player"
+          onLoad={() => {
+            if (isPlaying || userHasInteracted) {
+              setTimeout(() => {
+                postYTCommand("playVideo");
+                setIsPlaying(true);
+              }, 400);
+            }
+          }}
         />
       </div>
     </div>

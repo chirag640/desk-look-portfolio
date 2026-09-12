@@ -71,37 +71,104 @@ class AudioEngine {
     } catch {}
   }
 
-  // Mechanical Keyboard "Thock" Click
-  playThock() {
+  // Mechanical Keyboard Acoustic Switch Synthesis
+  playThock(customSwitch?: string) {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    const sw = customSwitch || (window as any)?.__KEYBOARD_SWITCH || "boba_u4t";
+    const t = ctx.currentTime;
+
+    try {
+      if (sw === "cherry_blue") {
+        // High crisp tactile click snap
+        const clickOsc = ctx.createOscillator();
+        const clickGain = ctx.createGain();
+        clickOsc.type = "sine";
+        clickOsc.frequency.setValueAtTime(2400, t);
+        clickOsc.frequency.exponentialRampToValueAtTime(650, t + 0.018);
+        clickGain.gain.setValueAtTime(0.09, t);
+        clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
+        clickOsc.connect(clickGain);
+        clickGain.connect(ctx.destination);
+        clickOsc.start();
+        clickOsc.stop(t + 0.025);
+
+        const bodyOsc = ctx.createOscillator();
+        const bodyGain = ctx.createGain();
+        bodyOsc.type = "triangle";
+        bodyOsc.frequency.setValueAtTime(450, t);
+        bodyOsc.frequency.exponentialRampToValueAtTime(200, t + 0.035);
+        bodyGain.gain.setValueAtTime(0.04, t);
+        bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+        bodyOsc.connect(bodyGain);
+        bodyGain.connect(ctx.destination);
+        bodyOsc.start();
+        bodyOsc.stop(t + 0.045);
+      } else if (sw === "gateron_yellow") {
+        // Creamy smooth butter thock
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(950, t);
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(420, t);
+        osc.frequency.exponentialRampToValueAtTime(140, t + 0.04);
+        gain.gain.setValueAtTime(0.08, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(t + 0.05);
+      } else {
+        // Boba U4T - Deep heavy acoustic wooden thock
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(480, t);
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(140, t);
+        osc.frequency.exponentialRampToValueAtTime(42, t + 0.06);
+        gain.gain.setValueAtTime(0.12, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(t + 0.075);
+      }
+    } catch {}
+  }
+
+  // Paper rustle sound for Post-it sticky note
+  playPaperRustle() {
     const ctx = this.getContext();
     if (!ctx) return;
     try {
       const t = ctx.currentTime;
-      // Low body thock
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(220, t);
-      osc.frequency.exponentialRampToValueAtTime(65, t + 0.045);
-      gain.gain.setValueAtTime(0.08, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
-      osc.connect(gain);
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(1800, t);
+      filter.frequency.exponentialRampToValueAtTime(800, t + 0.09);
+
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(320, t);
+      gain.gain.setValueAtTime(0.04, t);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+
+      osc.connect(filter);
+      filter.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(t + 0.055);
-
-      // High tactile click snap
-      const snapOsc = ctx.createOscillator();
-      const snapGain = ctx.createGain();
-      snapOsc.type = "sine";
-      snapOsc.frequency.setValueAtTime(1200, t);
-      snapOsc.frequency.exponentialRampToValueAtTime(450, t + 0.015);
-      snapGain.gain.setValueAtTime(0.03, t);
-      snapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
-      snapOsc.connect(snapGain);
-      snapGain.connect(ctx.destination);
-      snapOsc.start();
-      snapOsc.stop(t + 0.025);
+      osc.stop(t + 0.11);
     } catch {}
   }
 
@@ -252,9 +319,9 @@ export function useSoundEffects() {
     audioEngine.playWindowOpen();
   };
 
-  const playThock = () => {
+  const playThock = (customSwitch?: string) => {
     if (!soundEnabled) return;
-    audioEngine.playThock();
+    audioEngine.playThock(customSwitch);
   };
 
   const playMug = () => {
@@ -262,11 +329,17 @@ export function useSoundEffects() {
     audioEngine.playMug();
   };
 
+  const playPaperRustle = () => {
+    if (!soundEnabled) return;
+    audioEngine.playPaperRustle();
+  };
+
   return {
     playClick,
     playWindowOpen,
     playThock,
     playMug,
+    playPaperRustle,
     soundEnabled
   };
 }

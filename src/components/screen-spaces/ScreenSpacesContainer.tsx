@@ -11,7 +11,7 @@ import { ContactSpace } from "./ContactSpace";
 import { TerminalWindow } from "./TerminalWindow";
 import { MusicPopWidget } from "@/components/music/MusicPopWidget";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
-import { useAtmosphereStore, WallpaperTheme, LightingMood } from "@/hooks/useAtmosphereStore";
+import { useAtmosphereStore, WallpaperTheme, LightingMood, KeyboardSwitchType, SWITCH_PROFILES } from "@/hooks/useAtmosphereStore";
 import { useMusicStore, PLAYLISTS } from "@/hooks/useMusicStore";
 import {
   Monitor,
@@ -27,7 +27,9 @@ import {
   Sun,
   Moon,
   Sparkles,
-  Terminal as TerminalIcon
+  Terminal as TerminalIcon,
+  Keyboard,
+  Pin
 } from "lucide-react";
 
 interface ScreenSpacesContainerProps {
@@ -53,13 +55,16 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
   isZoomedIn = false,
   onToggleZoom
 }) => {
-  const { soundEnabled, playClick } = useSoundEffects();
+  const { soundEnabled, playClick, playThock, playPaperRustle } = useSoundEffects();
   const {
     lightingMood,
     setLightingMood,
     wallpaperTheme,
     setWallpaperTheme,
-    toggleTerminal
+    toggleTerminal,
+    keyboardSwitch,
+    setKeyboardSwitch,
+    toggleStickyNote
   } = useAtmosphereStore();
 
   const {
@@ -193,8 +198,40 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           })}
         </div>
 
-        {/* Right: Theme / Wallpaper / Zoom / Clock */}
-        <div className="flex items-center gap-2 sm:gap-3 relative">
+        {/* Right: Switch Profile / Scratchpad / Theme / Wallpaper / Zoom / Clock */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 relative">
+          {/* Desk Scratchpad 3M Note Quick Launcher */}
+          <button
+            onClick={() => {
+              playPaperRustle();
+              toggleStickyNote();
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FEF08A]/20 hover:bg-[#FEF08A]/30 text-yellow-300 border border-yellow-300/30 text-[11px] transition-colors cursor-pointer"
+            title="Desk Scratchpad (3M Yellow Sticky Note) - Leave quick feedback"
+          >
+            <Pin className="w-3 h-3 text-yellow-300" />
+            <span className="hidden sm:inline">Scratchpad</span>
+          </button>
+
+          {/* Mechanical Keyboard Switch Profile Customizer Button */}
+          <button
+            onClick={() => {
+              const next: KeyboardSwitchType =
+                keyboardSwitch === "boba_u4t"
+                  ? "gateron_yellow"
+                  : keyboardSwitch === "gateron_yellow"
+                  ? "cherry_blue"
+                  : "boba_u4t";
+              setKeyboardSwitch(next);
+              playThock(next);
+            }}
+            className="hidden md:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 text-[11px] transition-colors cursor-pointer border border-white/10"
+            title={`Mechanical Switch: ${SWITCH_PROFILES[keyboardSwitch].name} (${SWITCH_PROFILES[keyboardSwitch].soundDescription}) - Click to toggle profile`}
+          >
+            <Keyboard className="w-3.5 h-3.5 text-amber-400" />
+            <span className="font-mono text-[10px]">{SWITCH_PROFILES[keyboardSwitch].name.split(" ")[0]}</span>
+          </button>
+
           {/* Theme & Wallpaper Selector Dropdown Toggle */}
           <button
             onClick={() => {
@@ -205,12 +242,12 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
             title="Custom Wallpapers & Moods"
           >
             <Sparkles className="w-3 h-3 text-[#FBBF24]" />
-            <span className="hidden md:inline">Atmosphere</span>
+            <span className="hidden lg:inline">Atmosphere</span>
           </button>
 
           {/* Dropdown Menu */}
           {showThemeMenu && (
-            <div className="absolute top-10 right-14 w-52 p-2.5 rounded-xl bg-[#141A28]/95 border border-white/20 backdrop-blur-2xl shadow-2xl z-50 space-y-2 text-xs">
+            <div className="absolute top-10 right-14 w-60 p-3 rounded-xl bg-[#141A28]/95 border border-white/20 backdrop-blur-2xl shadow-2xl z-50 space-y-2.5 text-xs">
               <div className="text-[10px] font-mono text-slate-400 font-bold uppercase">
                 Studio Lighting Mood
               </div>
@@ -227,6 +264,29 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
                     }`}
                   >
                     {m === "night" ? "🌙 Night" : m === "golden" ? "☀️ Sunset" : "🌧️ Moody"}
+                  </button>
+                ))}
+              </div>
+
+              <div className="text-[10px] font-mono text-slate-400 font-bold uppercase pt-1">
+                Acoustic Mechanical Switches
+              </div>
+              <div className="grid grid-cols-1 gap-1 font-mono text-[10px]">
+                {(["boba_u4t", "gateron_yellow", "cherry_blue"] as KeyboardSwitchType[]).map((sw) => (
+                  <button
+                    key={sw}
+                    onClick={() => {
+                      setKeyboardSwitch(sw);
+                      playThock(sw);
+                    }}
+                    className={`p-1.5 rounded text-left flex items-center justify-between transition-colors cursor-pointer ${
+                      keyboardSwitch === sw
+                        ? "bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold"
+                        : "bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    <span>{SWITCH_PROFILES[sw].name}</span>
+                    <span className="text-[9px] text-slate-400">({SWITCH_PROFILES[sw].soundDescription})</span>
                   </button>
                 ))}
               </div>
@@ -408,6 +468,21 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
             <TerminalIcon className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
             <span className="pointer-events-none absolute -top-8 px-2 py-0.5 text-[10px] font-mono text-white bg-black/90 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
               Terminal
+            </span>
+          </button>
+
+          {/* Desk Scratchpad 3M Note Launcher in Dock */}
+          <button
+            onClick={() => {
+              playPaperRustle();
+              toggleStickyNote();
+            }}
+            className="group relative flex flex-col items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#FEF08A]/20 text-yellow-300 border border-yellow-300/40 hover:bg-[#FEF08A]/30 hover:-translate-y-0.5 transition-all cursor-pointer"
+            title="Desk Scratchpad (3M Yellow Note)"
+          >
+            <Pin className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110" />
+            <span className="pointer-events-none absolute -top-8 px-2 py-0.5 text-[10px] font-mono text-white bg-black/90 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md">
+              Scratchpad
             </span>
           </button>
         </div>
