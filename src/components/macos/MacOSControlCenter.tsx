@@ -18,11 +18,13 @@ import {
   Check,
   Disc3,
   Keyboard,
+  LayoutGrid,
+  Lock,
   X
 } from "lucide-react";
 
 export const MacOSControlCenter: React.FC = () => {
-  const { isControlCenterOpen, closeControlCenter } = useWindowManager();
+  const { isControlCenterOpen, closeControlCenter, toggleMissionControl, lockScreen } = useWindowManager();
   const {
     lightingMood,
     setLightingMood,
@@ -244,17 +246,60 @@ export const MacOSControlCenter: React.FC = () => {
         </div>
       </div>
 
-      {/* ── 5. 3D STUDIO DESK VIEW TOGGLE ── */}
+      {/* ── 5. STAGE MANAGER & SYSTEM LOCK TILES ── */}
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          onClick={() => {
+            playClick();
+            closeControlCenter();
+            toggleMissionControl();
+          }}
+          className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-start gap-1.5 transition-all cursor-pointer text-left group"
+        >
+          <div className="flex items-center justify-between w-full">
+            <LayoutGrid className="w-4 h-4 text-sky-400 group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+              F3
+            </span>
+          </div>
+          <div>
+            <div className="font-medium text-[11px] text-white">Stage Manager</div>
+            <div className="text-[10px] text-slate-400">Mission Control Tile</div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => {
+            playClick();
+            closeControlCenter();
+            lockScreen();
+          }}
+          className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex flex-col items-start gap-1.5 transition-all cursor-pointer text-left group"
+        >
+          <div className="flex items-center justify-between w-full">
+            <Lock className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+              ⌃⌘Q
+            </span>
+          </div>
+          <div>
+            <div className="font-medium text-[11px] text-white">Lock Screen</div>
+            <div className="text-[10px] text-slate-400">Sleep & Protect</div>
+          </div>
+        </button>
+      </div>
+
+      {/* ── 6. 3D STUDIO DESK VIEW TOGGLE ── */}
       <button
         onClick={() => {
           playClick();
           closeControlCenter();
           setCameraView(cameraView === "screen" ? "desk" : "screen");
         }}
-        className="w-full py-2 px-3 rounded-xl bg-[#1E293B]/80 hover:bg-[#334155] border border-white/15 flex items-center justify-between text-slate-200 hover:text-white transition-all cursor-pointer"
+        className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-between text-slate-200 hover:text-white transition-all cursor-pointer"
       >
         <div className="flex items-center gap-2">
-          <Monitor className="w-3.5 h-3.5 text-[#38BDF8]" />
+          <Monitor className="w-3.5 h-3.5 text-sky-400" />
           <span className="font-medium text-[11px]">
             {cameraView === "screen" ? "View 3D Studio Desk" : "Return to Full Screen"}
           </span>

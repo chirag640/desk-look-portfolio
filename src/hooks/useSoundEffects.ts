@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useCallback } from "react";
 import { create } from "zustand";
 
 interface SoundStore {
@@ -498,58 +499,58 @@ export const audioEngine = new AudioEngine();
 export function useSoundEffects() {
   const { soundEnabled } = useSoundStore();
 
-  const playClick = () => {
+  const playClick = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playClick();
-  };
+  }, [soundEnabled]);
 
-  const playWindowOpen = () => {
+  const playWindowOpen = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playWindowOpen();
-  };
+  }, [soundEnabled]);
 
-  const playThock = (customSwitch?: string) => {
-    if (!soundEnabled) return;
-    audioEngine.playThock(customSwitch);
-  };
-
-  const playMug = () => {
-    if (!soundEnabled) return;
-    audioEngine.playMug();
-  };
-
-  const playPaperRustle = () => {
-    if (!soundEnabled) return;
-    audioEngine.playPaperRustle();
-  };
-
-  const startTapeWarmth = () => {
-    audioEngine.startTapeWarmth();
-  };
-
-  const stopTapeWarmth = () => {
-    audioEngine.stopTapeWarmth();
-  };
-
-  const playMacSwoosh = () => {
+  const playMacSwoosh = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playMacSwoosh();
-  };
+  }, [soundEnabled]);
 
-  const playMacPop = () => {
+  const playMacPop = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playMacPop();
-  };
+  }, [soundEnabled]);
 
-  const playMacMinimize = () => {
+  const playMacMinimize = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playMacMinimize();
-  };
+  }, [soundEnabled]);
 
-  const playMacTrash = () => {
+  const playMacTrash = useCallback(() => {
     if (!soundEnabled) return;
     audioEngine.playMacTrash();
-  };
+  }, [soundEnabled]);
+
+  const playThock = useCallback((customSwitch?: string) => {
+    if (!soundEnabled) return;
+    audioEngine.playThock(customSwitch);
+  }, [soundEnabled]);
+
+  const playMug = useCallback(() => {
+    if (!soundEnabled) return;
+    audioEngine.playMug();
+  }, [soundEnabled]);
+
+  const playPaperRustle = useCallback(() => {
+    if (!soundEnabled) return;
+    audioEngine.playPaperRustle();
+  }, [soundEnabled]);
+
+  const startTapeWarmth = useCallback(() => {
+    audioEngine.startTapeWarmth();
+  }, []);
+
+  const stopTapeWarmth = useCallback(() => {
+    audioEngine.stopTapeWarmth();
+  }, []);
 
   return {
     playClick,

@@ -17,11 +17,12 @@ import {
   Disc3,
   Pin,
   Sparkles,
-  Command,
-  ArrowRight,
-  ExternalLink,
   Code2,
-  Monitor
+  Monitor,
+  LayoutGrid,
+  Lock,
+  Command,
+  ArrowRight
 } from "lucide-react";
 
 interface SpotlightItem {
@@ -40,7 +41,9 @@ export const MacOSSpotlight: React.FC = () => {
     closeSpotlight,
     setFinderTab,
     openWindow,
-    toggleWindow
+    toggleWindow,
+    toggleMissionControl,
+    lockScreen
   } = useWindowManager();
 
   const { toggleStickyNote, toggleTerminal, setCameraView } = useAtmosphereStore();
@@ -50,33 +53,26 @@ export const MacOSSpotlight: React.FC = () => {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevOpenRef = useRef(false);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Focus input automatically when opened
+  // Focus input automatically and reset state ONLY on open transition
   useEffect(() => {
-    if (isSpotlightOpen) {
+    if (isSpotlightOpen && !prevOpenRef.current) {
       setQuery("");
       setSelectedIndex(0);
       playMacSwoosh();
       setTimeout(() => inputRef.current?.focus(), 60);
     }
+    prevOpenRef.current = isSpotlightOpen;
   }, [isSpotlightOpen, playMacSwoosh]);
 
-  // Global ⌘K / Ctrl+K and Escape hotkeys
+  // Scroll active item into view when navigating with arrow keys
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        const { toggleSpotlight } = useWindowManager.getState();
-        toggleSpotlight();
-      } else if (e.key === "Escape" && isSpotlightOpen) {
-        e.preventDefault();
-        closeSpotlight();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSpotlightOpen, closeSpotlight]);
+    if (isSpotlightOpen && itemRefs.current[selectedIndex]) {
+      itemRefs.current[selectedIndex]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [selectedIndex, isSpotlightOpen]);
 
   const items: SpotlightItem[] = [
     // Pages
@@ -278,6 +274,30 @@ export const MacOSSpotlight: React.FC = () => {
         setCameraView("desk");
         closeSpotlight();
       }
+    },
+    {
+      id: "app-mission",
+      title: "Mission Control / Stage Manager",
+      subtitle: "Visually tile Finder, Terminal, and Vinyl Player windows (F3 or ⌘Tab)",
+      category: "Apps & Easter Eggs",
+      icon: LayoutGrid,
+      color: "text-sky-400 bg-sky-500/20",
+      action: () => {
+        closeSpotlight();
+        toggleMissionControl();
+      }
+    },
+    {
+      id: "app-lock",
+      title: "Lock Screen & Dynamic Apple TV Screensaver",
+      subtitle: "Dynamic Cupertino clock, IST Gandhinagar weather, and sleep (⌃⌘Q)",
+      category: "Apps & Easter Eggs",
+      icon: Lock,
+      color: "text-amber-400 bg-amber-500/20",
+      action: () => {
+        closeSpotlight();
+        lockScreen();
+      }
     }
   ];
 
@@ -296,22 +316,40 @@ export const MacOSSpotlight: React.FC = () => {
     item.action();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredItems.length));
-      playClick();
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % Math.max(1, filteredItems.length));
-      playClick();
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (filteredItems[selectedIndex]) {
-        handleSelect(filteredItems[selectedIndex]);
+  // Global ⌘K / Ctrl+K, Escape, Arrow Up/Down, and Enter hotkeys
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        const { toggleSpotlight } = useWindowManager.getState();
+        toggleSpotlight();
+        return;
       }
-    }
-  };
+
+      if (!isSpotlightOpen) return;
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeSpotlight();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev + 1) % Math.max(1, filteredItems.length));
+        playClick();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev - 1 + filteredItems.length) % Math.max(1, filteredItems.length));
+        playClick();
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (filteredItems[selectedIndex]) {
+          handleSelect(filteredItems[selectedIndex]);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSpotlightOpen, closeSpotlight, selectedIndex, filteredItems, playClick]);
 
   if (!isSpotlightOpen) return null;
 
@@ -335,7 +373,6 @@ export const MacOSSpotlight: React.FC = () => {
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            onKeyDown={handleKeyDown}
             placeholder="Spotlight Search (e.g. Flutter, projects, resume, music, terminal)..."
             className="flex-1 bg-transparent text-white text-sm placeholder:text-slate-500 focus:outline-none font-sans"
           />
@@ -357,11 +394,14 @@ export const MacOSSpotlight: React.FC = () => {
               return (
                 <button
                   key={item.id}
+                  ref={(el) => {
+                    itemRefs.current[index] = el;
+                  }}
                   onClick={() => handleSelect(item)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all cursor-pointer text-left ${
                     isSelected
-                      ? "bg-[#0284C7] text-white shadow-sm"
+                      ? "bg-[#0A84FF] text-white shadow-sm ring-1 ring-white/15"
                       : "hover:bg-white/5 text-slate-200"
                   }`}
                 >
@@ -391,13 +431,13 @@ export const MacOSSpotlight: React.FC = () => {
                     <span
                       className={`text-[10px] font-mono px-2 py-0.5 rounded ${
                         isSelected
-                          ? "bg-white/20 text-white"
+                          ? "bg-white/20 text-white font-medium"
                           : "bg-white/5 text-slate-400 border border-white/10"
                       }`}
                     >
                       {item.category}
                     </span>
-                    {isSelected && <ArrowRight className="w-3.5 h-3.5 text-white animate-pulse" />}
+                    {isSelected && <ArrowRight className="w-3.5 h-3.5 text-white" />}
                   </div>
                 </button>
               );

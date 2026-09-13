@@ -19,6 +19,8 @@ interface WindowManagerStore {
   isControlCenterOpen: boolean;
   isAppleMenuOpen: boolean;
   isSpotlightOpen: boolean;
+  isMissionControlOpen: boolean;
+  isLocked: boolean;
   highestZIndex: number;
 
   // Actions
@@ -35,6 +37,10 @@ interface WindowManagerStore {
   closeAppleMenu: () => void;
   toggleSpotlight: () => void;
   closeSpotlight: () => void;
+  toggleMissionControl: () => void;
+  closeMissionControl: () => void;
+  lockScreen: () => void;
+  unlockScreen: () => void;
   closeAllMenus: () => void;
 }
 
@@ -50,6 +56,8 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
   isControlCenterOpen: false,
   isAppleMenuOpen: false,
   isSpotlightOpen: false,
+  isMissionControlOpen: false,
+  isLocked: false,
   highestZIndex: 10,
 
   openWindow: (id: WindowId) => {
@@ -155,6 +163,27 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
 
   closeSpotlight: () => set({ isSpotlightOpen: false }),
 
+  toggleMissionControl: () =>
+    set((state) => ({
+      isMissionControlOpen: !state.isMissionControlOpen,
+      isControlCenterOpen: false,
+      isAppleMenuOpen: false,
+      isSpotlightOpen: false
+    })),
+
+  closeMissionControl: () => set({ isMissionControlOpen: false }),
+
+  lockScreen: () =>
+    set({
+      isLocked: true,
+      isControlCenterOpen: false,
+      isAppleMenuOpen: false,
+      isSpotlightOpen: false,
+      isMissionControlOpen: false
+    }),
+
+  unlockScreen: () => set({ isLocked: false }),
+
   closeAllMenus: () =>
     set({
       isControlCenterOpen: false,
@@ -162,3 +191,4 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
       isSpotlightOpen: false
     })
 }));
+

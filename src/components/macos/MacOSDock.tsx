@@ -13,15 +13,24 @@ import {
   Pin,
   Mail,
   Monitor,
+  LayoutGrid,
   Code
 } from "lucide-react";
 
-type DockAction = "finder" | "tech" | "projects" | "terminal" | "music" | "notes" | "contact" | "desk";
+type DockAction = "finder" | "tech" | "projects" | "terminal" | "music" | "notes" | "contact" | "mission" | "desk";
 
 export const MacOSDock: React.FC = () => {
-  const { windows, openWindow, toggleWindow, focusWindow, setFinderTab } = useWindowManager();
+  const {
+    windows,
+    openWindow,
+    toggleWindow,
+    focusWindow,
+    setFinderTab,
+    isMissionControlOpen,
+    toggleMissionControl
+  } = useWindowManager();
   const { cameraView, setCameraView } = useAtmosphereStore();
-  const { playClick, playPaperRustle } = useSoundEffects();
+  const { playClick, playMacSwoosh, playPaperRustle } = useSoundEffects();
 
   const handleAppClick = (app: DockAction) => {
     playClick();
@@ -45,6 +54,9 @@ export const MacOSDock: React.FC = () => {
     } else if (app === "notes") {
       playPaperRustle();
       toggleWindow("notes");
+    } else if (app === "mission") {
+      playMacSwoosh();
+      toggleMissionControl();
     } else if (app === "desk") {
       setCameraView(cameraView === "screen" ? "desk" : "screen");
     }
@@ -77,6 +89,13 @@ export const MacOSDock: React.FC = () => {
       icon: Box,
       color: "from-amber-500 to-orange-600",
       isOpen: windows.finder.isOpen && !windows.finder.isMinimized
+    },
+    {
+      id: "mission",
+      name: "Mission Control [F3]",
+      icon: LayoutGrid,
+      color: "from-sky-500 to-blue-700",
+      isOpen: isMissionControlOpen
     },
     {
       id: "terminal",

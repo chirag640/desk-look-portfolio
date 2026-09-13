@@ -29,6 +29,8 @@ export const MacOSMenuBar: React.FC = () => {
     closeAppleMenu,
     toggleControlCenter,
     toggleSpotlight,
+    toggleMissionControl,
+    lockScreen,
     setFinderTab,
     openWindow,
     closeAllMenus
@@ -78,7 +80,10 @@ export const MacOSMenuBar: React.FC = () => {
   };
 
   return (
-    <header className="relative w-full h-7 bg-[#0A0D14]/80 backdrop-blur-2xl border-b border-white/10 z-40 flex items-center justify-between px-2 sm:px-3 text-xs text-slate-200 select-none font-sans">
+    <header
+      onClick={(e) => e.stopPropagation()}
+      className="relative w-full h-7 bg-[#12141A]/90 backdrop-blur-2xl border-b border-white/10 z-40 flex items-center justify-between px-2 sm:px-3 text-xs text-slate-200 select-none font-sans"
+    >
       {/* ── LEFT MENU ITEMS ── */}
       <div className="flex items-center gap-1">
         {/* Apple  Logo Button */}
@@ -99,7 +104,7 @@ export const MacOSMenuBar: React.FC = () => {
           {/* Apple Dropdown Menu */}
           {isAppleMenuOpen && (
             <div
-              className="absolute top-7 left-0 w-60 rounded-xl bg-[#0F172A]/95 border border-white/15 shadow-2xl backdrop-blur-3xl z-50 py-1 text-xs text-slate-200"
+              className="absolute top-7 left-0 w-64 rounded-xl bg-[#16181D]/95 border border-white/15 shadow-2xl backdrop-blur-3xl z-50 py-1 text-xs text-slate-200"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -107,7 +112,7 @@ export const MacOSMenuBar: React.FC = () => {
                   handleGoTo("about");
                   closeAppleMenu();
                 }}
-                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0284C7] hover:text-white flex items-center justify-between cursor-pointer"
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
               >
                 <span>About Chirag Chaudhary</span>
                 <span className="text-[10px] text-slate-400">TCS SE</span>
@@ -117,7 +122,7 @@ export const MacOSMenuBar: React.FC = () => {
                   window.open("https://github.com/chirag640", "_blank");
                   closeAppleMenu();
                 }}
-                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0284C7] hover:text-white flex items-center justify-between cursor-pointer"
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
               >
                 <span>GitHub Profile (@chirag640)</span>
                 <ExternalLink className="w-3 h-3 text-slate-400" />
@@ -127,7 +132,7 @@ export const MacOSMenuBar: React.FC = () => {
                   window.open("https://www.linkedin.com/in/chiragchaudhary1910/", "_blank");
                   closeAppleMenu();
                 }}
-                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0284C7] hover:text-white flex items-center justify-between cursor-pointer"
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
               >
                 <span>LinkedIn Profile</span>
                 <ExternalLink className="w-3 h-3 text-slate-400" />
@@ -136,10 +141,33 @@ export const MacOSMenuBar: React.FC = () => {
               <button
                 onClick={() => {
                   playClick();
+                  toggleMissionControl();
+                  closeAppleMenu();
+                }}
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
+              >
+                <span>Mission Control / Stage Manager</span>
+                <span className="text-[10px] font-mono text-slate-400">F3</span>
+              </button>
+              <button
+                onClick={() => {
+                  playClick();
+                  lockScreen();
+                  closeAppleMenu();
+                }}
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
+              >
+                <span>Lock Screen</span>
+                <span className="text-[10px] font-mono text-slate-400">⌃⌘Q</span>
+              </button>
+              <div className="h-px bg-white/10 my-1" />
+              <button
+                onClick={() => {
+                  playClick();
                   setCameraView(cameraView === "screen" ? "desk" : "screen");
                   closeAppleMenu();
                 }}
-                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0284C7] hover:text-white flex items-center justify-between cursor-pointer"
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
               >
                 <span>3D Studio Desk Camera View</span>
                 <span className="text-[10px] font-mono text-slate-400">[Z]</span>
@@ -149,7 +177,7 @@ export const MacOSMenuBar: React.FC = () => {
                 onClick={() => {
                   window.location.reload();
                 }}
-                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0284C7] hover:text-white flex items-center justify-between cursor-pointer text-slate-300"
+                className="w-full px-3.5 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer text-slate-300"
               >
                 <span>Restart ChiragOS</span>
                 <span className="text-[10px] font-mono text-slate-400">⌘R</span>
@@ -274,7 +302,7 @@ export const MacOSMenuBar: React.FC = () => {
             </button>
             {activeDropdown === "window" && (
               <div
-                className="absolute top-7 left-0 w-48 rounded-xl bg-[#0F172A]/95 border border-white/15 shadow-2xl backdrop-blur-3xl z-50 py-1 text-xs text-slate-200"
+                className="absolute top-7 left-0 w-56 rounded-xl bg-[#16181D]/95 border border-white/15 shadow-2xl backdrop-blur-3xl z-50 py-1 text-xs text-slate-200"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -282,7 +310,7 @@ export const MacOSMenuBar: React.FC = () => {
                     openWindow("finder");
                     setActiveDropdown(null);
                   }}
-                  className="w-full px-3 py-1.5 text-left hover:bg-[#0284C7] hover:text-white cursor-pointer"
+                  className="w-full px-3 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white cursor-pointer"
                 >
                   Focus Finder
                 </button>
@@ -291,7 +319,7 @@ export const MacOSMenuBar: React.FC = () => {
                     openWindow("terminal");
                     setActiveDropdown(null);
                   }}
-                  className="w-full px-3 py-1.5 text-left hover:bg-[#0284C7] hover:text-white cursor-pointer"
+                  className="w-full px-3 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white cursor-pointer"
                 >
                   Focus Terminal CLI
                 </button>
@@ -300,9 +328,32 @@ export const MacOSMenuBar: React.FC = () => {
                     openWindow("music");
                     setActiveDropdown(null);
                   }}
-                  className="w-full px-3 py-1.5 text-left hover:bg-[#0284C7] hover:text-white cursor-pointer"
+                  className="w-full px-3 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white cursor-pointer"
                 >
                   Focus Music Player
+                </button>
+                <div className="h-px bg-white/10 my-1" />
+                <button
+                  onClick={() => {
+                    playClick();
+                    toggleMissionControl();
+                    setActiveDropdown(null);
+                  }}
+                  className="w-full px-3 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
+                >
+                  <span>Mission Control</span>
+                  <span className="text-[10px] font-mono text-slate-400">F3</span>
+                </button>
+                <button
+                  onClick={() => {
+                    playClick();
+                    lockScreen();
+                    setActiveDropdown(null);
+                  }}
+                  className="w-full px-3 py-1.5 text-left hover:bg-[#0A84FF] hover:text-white flex items-center justify-between cursor-pointer"
+                >
+                  <span>Lock Screen</span>
+                  <span className="text-[10px] font-mono text-slate-400">⌃⌘Q</span>
                 </button>
               </div>
             )}
@@ -347,6 +398,20 @@ export const MacOSMenuBar: React.FC = () => {
         <div title="Wi-Fi 6E (Connected: Gandhinagar Node)">
           <Wifi className="w-3.5 h-3.5 text-slate-300" />
         </div>
+
+        {/* Spotlight Search Icon */}
+        <button
+          onClick={() => {
+            playClick();
+            toggleSpotlight();
+            closeAppleMenu();
+            setActiveDropdown(null);
+          }}
+          className="p-1 rounded hover:bg-white/15 text-slate-200 transition-colors cursor-pointer"
+          title="Spotlight Search (⌘K)"
+        >
+          <Search className="w-3.5 h-3.5" />
+        </button>
 
         {/* macOS Control Center Icon (Two Sliders) */}
         <button

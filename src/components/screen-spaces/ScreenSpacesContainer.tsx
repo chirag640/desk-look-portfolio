@@ -7,6 +7,8 @@ import { FinderWindow } from "@/components/macos/FinderWindow";
 import { MacOSDock } from "@/components/macos/MacOSDock";
 import { MacOSWidgets } from "@/components/macos/MacOSWidgets";
 import { MacOSSpotlight } from "@/components/macos/MacOSSpotlight";
+import { MacOSMissionControl } from "@/components/macos/MacOSMissionControl";
+import { MacOSLockScreen } from "@/components/macos/MacOSLockScreen";
 import { TerminalWindow } from "./TerminalWindow";
 import { MusicPopWidget } from "@/components/music/MusicPopWidget";
 import { useWindowManager, FinderTab } from "@/hooks/useWindowManager";
@@ -185,10 +187,16 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
         {/* ── 7. MACOS SPOTLIGHT ⌘K SEARCH OVERLAY ── */}
         <MacOSSpotlight />
+
+        {/* ── 8. MACOS STAGE MANAGER / MISSION CONTROL OVERLAY ── */}
+        <MacOSMissionControl />
       </div>
 
-      {/* ── 8. NATIVE MACOS DOCK ── */}
+      {/* ── 9. NATIVE MACOS DOCK ── */}
       <MacOSDock />
+
+      {/* ── 10. DYNAMIC CUPERTINO LOCK SCREEN / SCREENSAVER (60S INACTIVITY) ── */}
+      <MacOSLockScreen />
     </div>
   );
 };
