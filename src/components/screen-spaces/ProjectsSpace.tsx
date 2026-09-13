@@ -33,7 +33,7 @@ export const ProjectsSpace: React.FC = () => {
               Applications & Open Source Registry
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              PUB.DEV PACKAGES & FULL-STACK SYSTEMS · VIRTUAL SPACE 4
+              PUB.DEV PACKAGES & FULL-STACK SYSTEMS
             </p>
           </div>
         </div>
@@ -260,8 +260,8 @@ export const ProjectsSpace: React.FC = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 4/7 · APPLICATIONS EXPLORER</span>
-        <span>Scroll to slide to System History (TCS & Milestones) →</span>
+        <span>Featured Applications & Open Source Repositories</span>
+        <span>Maintained by Chirag Chaudhary · Verified Architecture</span>
       </div>
     </div>
   );

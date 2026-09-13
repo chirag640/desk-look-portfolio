@@ -19,7 +19,7 @@ export const HistorySpace: React.FC = () => {
               System History & Career Milestones
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              TCS & PUB.DEV RELEASES · VIRTUAL SPACE 5
+              TCS ENTERPRISE & OPEN SOURCE ECOSYSTEM
             </p>
           </div>
         </div>
@@ -98,8 +98,8 @@ export const HistorySpace: React.FC = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 5/7 · SYSTEM HISTORY</span>
-        <span>Scroll to slide to Document & 70 GitHub Repos Station →</span>
+        <span>Verified Engineering Career & Milestones</span>
+        <span>Software Engineer · Tata Consultancy Services</span>
       </div>
     </div>
   );

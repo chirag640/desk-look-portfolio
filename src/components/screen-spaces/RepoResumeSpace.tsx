@@ -30,7 +30,7 @@ export const RepoResumeSpace: React.FC = () => {
               Document Viewer & 70 Repositories Explorer
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              VERIFIED RESUME & GITHUB ARCHIVE · VIRTUAL SPACE 6
+              VERIFIED RESUME & GITHUB REPOSITORIES ARCHIVE
             </p>
           </div>
         </div>
@@ -172,8 +172,8 @@ export const RepoResumeSpace: React.FC = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 6/7 · DOCUMENT & REPOSITORIES</span>
-        <span>Scroll to slide to Communication Terminal →</span>
+        <span>Verified Resume & GitHub Repositories Archive</span>
+        <span>70 Public Repositories @chirag640</span>
       </div>
     </div>
   );

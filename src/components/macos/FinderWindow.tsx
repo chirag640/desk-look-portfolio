@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useWindowManager, FinderTab } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { ProfileSpace } from "@/components/screen-spaces/ProfileSpace";
@@ -17,21 +17,80 @@ import {
   FileText,
   Mail,
   Folder,
-  ChevronRight,
   Search,
   Laptop,
   Cloud,
-  Layers,
-  Sparkles,
   ExternalLink
 } from "lucide-react";
 
 export const FinderWindow: React.FC = () => {
-  const { windows, closeWindow, minimizeWindow, maximizeWindow, focusWindow, finderTab, setFinderTab, activeWindow } =
-    useWindowManager();
-  const { playClick, playThock } = useSoundEffects();
+  const {
+    windows,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    focusWindow,
+    finderTab,
+    setFinderTab,
+    activeWindow,
+    toggleSpotlight
+  } = useWindowManager();
+
+  const { playClick, playMacPop, playMacMinimize, playMacSwoosh } = useSoundEffects();
 
   const win = windows.finder;
+
+  // Window Dragging State
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartRef = useRef({ startX: 0, startY: 0, posX: 0, posY: 0 });
+  const windowRef = useRef<HTMLDivElement>(null);
+
+  // Dragging event listeners
+  const handleMouseDown = (e: React.MouseEvent) => {
+    // Only allow left click on title bar for dragging
+    if (e.button !== 0 || win.isMaximized) return;
+
+    const el = windowRef.current;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const curX = position ? position.x : rect.left;
+    const curY = position ? position.y : rect.top;
+
+    setIsDragging(true);
+    dragStartRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      posX: curX,
+      posY: curY
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartRef.current.startX;
+      const dy = e.clientY - dragStartRef.current.startY;
+
+      const newX = Math.max(10, Math.min(window.innerWidth - 300, dragStartRef.current.posX + dx));
+      const newY = Math.max(34, Math.min(window.innerHeight - 150, dragStartRef.current.posY + dy));
+
+      setPosition({ x: newX, y: newY });
+    };
+
+    const handleMouseUp = () => setIsDragging(false);
+
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
+
   if (!win.isOpen || win.isMinimized) return null;
 
   const isFocused = activeWindow === "finder";
@@ -45,20 +104,47 @@ export const FinderWindow: React.FC = () => {
     { id: "contact", label: "Contact Engineer", icon: Mail }
   ];
 
+  const handleTabClick = (tabId: FinderTab) => {
+    playMacPop();
+    setFinderTab(tabId);
+  };
+
+  // Dynamic positioning style
+  const positionStyle: React.CSSProperties = win.isMaximized
+    ? { top: "34px", left: "8px", right: "8px", bottom: "72px", zIndex: win.zIndex }
+    : position
+    ? {
+        position: "absolute",
+        left: `${position.x}px`,
+        top: `${position.y}px`,
+        width: "min(1280px, 94vw)",
+        height: "min(760px, 80vh)",
+        zIndex: win.zIndex
+      }
+    : {
+        position: "absolute",
+        left: "50%",
+        top: "48%",
+        transform: "translate(-50%, -50%)",
+        width: "min(1280px, 94vw)",
+        height: "min(760px, 80vh)",
+        zIndex: win.zIndex
+      };
+
   return (
     <div
+      ref={windowRef}
       onClick={() => focusWindow("finder")}
-      style={{ zIndex: win.zIndex }}
-      className={`absolute transition-all duration-300 ${
-        win.isMaximized
-          ? "inset-2 sm:inset-4"
-          : "inset-2 sm:inset-4 md:inset-x-8 md:inset-y-6 lg:inset-x-12 lg:inset-y-8 max-w-[1400px] max-h-[860px] mx-auto my-auto"
-      } rounded-2xl bg-[#090D16]/90 border ${
-        isFocused ? "border-white/20 shadow-[0_25px_80px_rgba(0,0,0,0.95)]" : "border-white/10 shadow-xl opacity-95"
-      } backdrop-blur-3xl flex flex-col overflow-hidden select-none`}
+      style={positionStyle}
+      className={`rounded-2xl bg-[#090D16]/95 border ${
+        isFocused ? "border-white/25 shadow-[0_25px_80px_rgba(0,0,0,0.95)]" : "border-white/10 shadow-xl opacity-95"
+      } backdrop-blur-3xl flex flex-col overflow-hidden select-none transition-shadow duration-200`}
     >
       {/* ── 1. MACOS WINDOW TITLE BAR & TRAFFIC LIGHTS ── */}
-      <div className="h-10 px-3.5 bg-[#0D1322]/80 border-b border-white/10 flex items-center justify-between text-xs text-slate-300">
+      <div
+        onMouseDown={handleMouseDown}
+        className="h-10 px-3.5 bg-[#0D1322]/90 border-b border-white/10 flex items-center justify-between text-xs text-slate-300 cursor-move select-none"
+      >
         {/* Left: Traffic Lights */}
         <div className="flex items-center gap-2">
           {/* Red: Close */}
@@ -78,7 +164,7 @@ export const FinderWindow: React.FC = () => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              playClick();
+              playMacMinimize();
               minimizeWindow("finder");
             }}
             className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] hover:brightness-110 flex items-center justify-center group cursor-pointer transition-transform active:scale-90"
@@ -91,7 +177,7 @@ export const FinderWindow: React.FC = () => {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              playClick();
+              playMacSwoosh();
               maximizeWindow("finder");
             }}
             className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] hover:brightness-110 flex items-center justify-center group cursor-pointer transition-transform active:scale-90"
@@ -110,23 +196,31 @@ export const FinderWindow: React.FC = () => {
         </div>
 
         {/* Center: Active Tab Indicator */}
-        <div className="text-[11px] font-medium text-slate-300 font-mono hidden md:block">
+        <div className="text-[11px] font-medium text-slate-400 font-mono hidden md:block">
           chirag.engineer · macOS Sequoia v2.6
         </div>
 
-        {/* Right: Quick Search & Actions */}
+        {/* Right: Quick Spotlight Search Button */}
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-400 text-[11px]">
-            <Search className="w-3 h-3" />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              playClick();
+              toggleSpotlight();
+            }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white text-[11px] cursor-pointer transition-colors"
+            title="Spotlight Search ⌘K"
+          >
+            <Search className="w-3 h-3 text-[#38BDF8]" />
             <span className="font-mono text-[10px]">Spotlight ⌘K</span>
-          </div>
+          </button>
         </div>
       </div>
 
       {/* ── 2. FINDER MAIN WORKSPACE: SIDEBAR + CONTENT ── */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar */}
-        <aside className="w-48 sm:w-56 bg-[#080B12]/80 border-r border-white/10 flex flex-col justify-between p-2.5 sm:p-3 overflow-y-auto select-none">
+        <aside className="w-48 sm:w-56 bg-[#080B12]/85 border-r border-white/10 flex flex-col justify-between p-2.5 sm:p-3 overflow-y-auto select-none shrink-0">
           <div className="space-y-4">
             {/* Favorites Section */}
             <div>
@@ -140,10 +234,7 @@ export const FinderWindow: React.FC = () => {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => {
-                        playClick();
-                        setFinderTab(tab.id);
-                      }}
+                      onClick={() => handleTabClick(tab.id)}
                       className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer text-left ${
                         isActive
                           ? "bg-[#0284C7] text-white shadow-sm font-semibold"
@@ -168,6 +259,7 @@ export const FinderWindow: React.FC = () => {
                   href="https://github.com/chirag640"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => playClick()}
                   className="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
@@ -180,6 +272,7 @@ export const FinderWindow: React.FC = () => {
                   href="https://www.linkedin.com/in/chiragchaudhary1910/"
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => playClick()}
                   className="flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
                 >
                   <div className="flex items-center gap-2">
@@ -200,7 +293,7 @@ export const FinderWindow: React.FC = () => {
         </aside>
 
         {/* Right Content Area */}
-        <main className="flex-1 bg-[#06080F]/60 overflow-y-auto relative">
+        <main className="flex-1 bg-[#06080F]/60 overflow-y-auto relative p-1 sm:p-2">
           {finderTab === "about" && <ProfileSpace />}
           {finderTab === "tech" && <TechSpace />}
           {finderTab === "projects" && <ProjectsSpace />}
@@ -211,7 +304,7 @@ export const FinderWindow: React.FC = () => {
               onNavigateSpace={(idx: number) => {
                 const navTabs: FinderTab[] = ["about", "tech", "projects", "history", "resume", "contact"];
                 if (navTabs[idx]) {
-                  setFinderTab(navTabs[idx]);
+                  handleTabClick(navTabs[idx]);
                 }
               }}
             />

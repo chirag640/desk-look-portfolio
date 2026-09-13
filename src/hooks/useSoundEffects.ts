@@ -57,20 +57,110 @@ class AudioEngine {
   }
 
   playWindowOpen() {
+    this.playMacSwoosh();
+  }
+
+  playMacSwoosh() {
     const ctx = this.getContext();
     if (!ctx) return;
     try {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(520, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(780, ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.03, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+      const filter = ctx.createBiquadFilter();
+
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(400, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime + 0.06);
+      filter.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.14);
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(220, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(580, ctx.currentTime + 0.08);
+
+      gain.gain.setValueAtTime(0.04, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.16);
+    } catch {}
+  }
+
+  playMacPop() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(950, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.035);
+
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
+
       osc.start();
-      osc.stop(ctx.currentTime + 0.09);
+      osc.stop(ctx.currentTime + 0.045);
+    } catch {}
+  }
+
+  playMacMinimize() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(680, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(240, ctx.currentTime + 0.12);
+
+      gain.gain.setValueAtTime(0.035, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.13);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.14);
+    } catch {}
+  }
+
+  playMacTrash() {
+    const ctx = this.getContext();
+    if (!ctx) return;
+    try {
+      const bufferSize = ctx.sampleRate * 0.08;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.25));
+      }
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(800, ctx.currentTime);
+      filter.Q.setValueAtTime(1.5, ctx.currentTime);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.06, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      noise.start();
     } catch {}
   }
 
@@ -441,9 +531,33 @@ export function useSoundEffects() {
     audioEngine.stopTapeWarmth();
   };
 
+  const playMacSwoosh = () => {
+    if (!soundEnabled) return;
+    audioEngine.playMacSwoosh();
+  };
+
+  const playMacPop = () => {
+    if (!soundEnabled) return;
+    audioEngine.playMacPop();
+  };
+
+  const playMacMinimize = () => {
+    if (!soundEnabled) return;
+    audioEngine.playMacMinimize();
+  };
+
+  const playMacTrash = () => {
+    if (!soundEnabled) return;
+    audioEngine.playMacTrash();
+  };
+
   return {
     playClick,
     playWindowOpen,
+    playMacSwoosh,
+    playMacPop,
+    playMacMinimize,
+    playMacTrash,
     playThock,
     playMug,
     playPaperRustle,

@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { MacOSMenuBar } from "@/components/macos/MacOSMenuBar";
 import { MacOSControlCenter } from "@/components/macos/MacOSControlCenter";
 import { FinderWindow } from "@/components/macos/FinderWindow";
 import { MacOSDock } from "@/components/macos/MacOSDock";
+import { MacOSWidgets } from "@/components/macos/MacOSWidgets";
+import { MacOSSpotlight } from "@/components/macos/MacOSSpotlight";
 import { TerminalWindow } from "./TerminalWindow";
 import { MusicPopWidget } from "@/components/music/MusicPopWidget";
 import { useWindowManager, FinderTab } from "@/hooks/useWindowManager";
@@ -17,11 +19,7 @@ import {
   Clock,
   FileText,
   Mail,
-  Terminal,
-  Disc3,
-  Pin,
-  Sparkles,
-  ExternalLink
+  Terminal
 } from "lucide-react";
 
 interface ScreenSpacesContainerProps {
@@ -37,19 +35,9 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
   isZoomedIn = true,
   onToggleZoom
 }) => {
-  const { wallpaperTheme, toggleTerminal, toggleStickyNote } = useAtmosphereStore();
-  const { windows, openWindow, setFinderTab, closeAllMenus } = useWindowManager();
-  const { playClick, playPaperRustle } = useSoundEffects();
-
-  // Synchronize external scroll progress with Finder tabs
-  useEffect(() => {
-    const tabs: FinderTab[] = ["about", "tech", "projects", "history", "resume", "contact"];
-    const idx = Math.min(tabs.length - 1, Math.max(0, Math.round(progress * (tabs.length - 1))));
-    // Only update if Finder is already open
-    if (windows.finder.isOpen) {
-      setFinderTab(tabs[idx]);
-    }
-  }, [progress, windows.finder.isOpen, setFinderTab]);
+  const { wallpaperTheme, toggleTerminal } = useAtmosphereStore();
+  const { openWindow, setFinderTab, closeAllMenus } = useWindowManager();
+  const { playClick, playMacPop, playMacSwoosh } = useSoundEffects();
 
   // Soothing macOS Sequoia wallpapers
   const wallpaperStyles: Record<WallpaperTheme, { bg: string; orb1: string; orb2: string }> = {
@@ -77,7 +65,7 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
   const currentWp = wallpaperStyles[wallpaperTheme] || wallpaperStyles.obsidian;
 
-  // Desktop shortcuts to access spaces quickly
+  // Desktop shortcuts to access spaces directly
   const desktopShortcuts = [
     {
       id: "about" as FinderTab,
@@ -93,7 +81,7 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
     },
     {
       id: "projects" as FinderTab,
-      label: "Projects (v3)",
+      label: "Projects",
       icon: Box,
       color: "text-amber-400 bg-amber-500/20"
     },
@@ -118,7 +106,7 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
   ];
 
   const handleOpenFinderTab = (tab: FinderTab) => {
-    playClick();
+    playMacPop();
     setFinderTab(tab);
     openWindow("finder");
   };
@@ -144,6 +132,9 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
       {/* ── 3. MACOS DESKTOP WORKSPACE CANVAS ── */}
       <div className="relative flex-1 w-full overflow-hidden p-3 sm:p-5">
+        {/* Desktop Widgets (Gandhinagar Weather, GitHub Activity, Specs) */}
+        <MacOSWidgets />
+
         {/* Desktop Icons Grid (Top-Right macOS arrangement) */}
         <div className="absolute top-4 right-4 sm:right-6 flex flex-col gap-3 z-10">
           {desktopShortcuts.map((sc) => {
@@ -169,7 +160,7 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           {/* Quick Terminal Shortcut */}
           <button
             onClick={() => {
-              playClick();
+              playMacSwoosh();
               toggleTerminal();
             }}
             className="group flex flex-col items-center gap-1 w-20 p-2 rounded-xl hover:bg-white/10 active:bg-white/20 transition-all cursor-pointer text-center"
@@ -183,22 +174,6 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
           </button>
         </div>
 
-        {/* Desktop Welcome Watermark (Visible when windows are minimized) */}
-        <div className="absolute bottom-24 left-6 sm:left-10 z-0 pointer-events-none opacity-40 max-w-sm select-none">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-2xl text-white font-light"></span>
-            <span className="text-sm font-semibold tracking-wider text-white uppercase font-mono">
-              ChiragOS Sequoia
-            </span>
-          </div>
-          <p className="text-xs text-slate-300 font-mono">
-            TCS Software Engineer · Gandhinagar Node
-          </p>
-          <p className="text-[11px] text-slate-400 mt-1">
-            Double-click any desktop folder or dock app to explore. Press [Z] to return to 3D desk.
-          </p>
-        </div>
-
         {/* ── 4. AUTHENTIC FROSTED-GLASS FINDER WINDOW ── */}
         <FinderWindow />
 
@@ -207,9 +182,12 @@ export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
 
         {/* ── 6. STUDIO VINYL MUSIC PLAYER WIDGET ── */}
         <MusicPopWidget />
+
+        {/* ── 7. MACOS SPOTLIGHT ⌘K SEARCH OVERLAY ── */}
+        <MacOSSpotlight />
       </div>
 
-      {/* ── 7. NATIVE MACOS DOCK ── */}
+      {/* ── 8. NATIVE MACOS DOCK ── */}
       <MacOSDock />
     </div>
   );

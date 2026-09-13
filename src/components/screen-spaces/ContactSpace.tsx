@@ -44,7 +44,7 @@ export const ContactSpace: React.FC<ContactSpaceProps> = ({ onNavigateSpace }) =
               Communication Terminal & Direct Transmission
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              GANDHINAGAR NODE · VIRTUAL SPACE 7
+              GANDHINAGAR NODE · DIRECT TRANSMISSION ENDPOINT
             </p>
           </div>
         </div>
@@ -201,14 +201,8 @@ export const ContactSpace: React.FC<ContactSpaceProps> = ({ onNavigateSpace }) =
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 7/7 · END OF TRANSMISSION</span>
-        <button
-          onClick={() => onNavigateSpace(0)}
-          className="flex items-center gap-1.5 text-[#5B8DEF] hover:underline cursor-pointer"
-        >
-          <ArrowUp className="w-3.5 h-3.5" />
-          <span>Back to Master Desktop (Space 1)</span>
-        </button>
+        <span>Chirag Chaudhary · Software Engineer (TCS)</span>
+        <span>Gandhinagar, Gujarat, India · Available for Collaborations</span>
       </div>
     </div>
   );

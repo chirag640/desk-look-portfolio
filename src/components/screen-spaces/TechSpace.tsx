@@ -36,7 +36,7 @@ export const TechSpace: React.FC = () => {
               Installed Technologies & Architecture
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              PACKAGE REGISTRY & RUNTIMES · VIRTUAL SPACE 3
+              PACKAGE REGISTRY & PRODUCTION RUNTIMES
             </p>
           </div>
         </div>
@@ -150,8 +150,8 @@ export const TechSpace: React.FC = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 3/7 · INSTALLED TECHNOLOGIES</span>
-        <span>Scroll to slide to Applications Explorer (flutter_blueprint) →</span>
+        <span>6 Core Skill Domains · 18 Verified Technologies</span>
+        <span>Strict Null Safety in Dart & TypeScript · Production Ready</span>
       </div>
     </div>
   );

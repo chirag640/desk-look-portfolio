@@ -19,7 +19,7 @@ export const ProfileSpace: React.FC = () => {
               System Profile & Engineering Overview
             </h2>
             <p className="text-xs font-mono text-slate-400">
-              CHIRAG.SYS · VIRTUAL SPACE 2
+              CHIRAG.SYS · TATA CONSULTANCY SERVICES
             </p>
           </div>
         </div>
@@ -120,8 +120,8 @@ export const ProfileSpace: React.FC = () => {
 
       {/* Footer */}
       <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-4 border-t border-white/10">
-        <span>SPACE 2/7 · SYSTEM PROFILE</span>
-        <span>Scroll to slide to Installed Technologies & Architecture →</span>
+        <span>Chirag Chaudhary · Software Engineer</span>
+        <span>Tata Consultancy Services (TCS) · Gandhinagar Node</span>
       </div>
     </div>
   );

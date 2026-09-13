@@ -51,35 +51,12 @@ export default function Home() {
         } else {
           setCameraView(cameraView === "screen" ? "desk" : "screen");
         }
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        scrollTo(0.0);
-      } else if (e.key === "End") {
-        e.preventDefault();
-        scrollTo(1.0);
-      } else if (
-        e.key === "ArrowRight" ||
-        e.key === "ArrowDown" ||
-        e.key === "PageDown" ||
-        e.key === " "
-      ) {
-        e.preventDefault();
-        const nextSpace = Math.min(6, Math.round(progress * 6) + 1);
-        scrollTo(nextSpace / 6);
-      } else if (
-        e.key === "ArrowLeft" ||
-        e.key === "ArrowUp" ||
-        e.key === "PageUp"
-      ) {
-        e.preventDefault();
-        const prevSpace = Math.max(0, Math.round(progress * 6) - 1);
-        scrollTo(prevSpace / 6);
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [progress, scrollTo, cameraView, setCameraView]);
+  }, [cameraView, setCameraView]);
 
   const handleToggleZoom = useCallback(() => {
     if (cameraView === "macbook") {
