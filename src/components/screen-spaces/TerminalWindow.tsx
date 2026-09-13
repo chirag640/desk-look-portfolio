@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Terminal, X, Minus, Square, Send, Sparkles, Trophy, Play, RefreshCw, Mail, ExternalLink, FileText } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
+import { useWindowManager } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useMusicStore, PLAYLISTS } from "@/hooks/useMusicStore";
 
@@ -14,7 +15,10 @@ interface TerminalLine {
 
 export const TerminalWindow: React.FC = () => {
   const { isTerminalOpen, setTerminalOpen, keyboardSwitch } = useAtmosphereStore();
+  const { windows, closeWindow, minimizeWindow, focusWindow } = useWindowManager();
   const { playClick, playThock } = useSoundEffects();
+
+  const isOpen = isTerminalOpen || (windows.terminal?.isOpen && !windows.terminal?.isMinimized);
   const {
     activePlaylist,
     isPlaying,
@@ -251,7 +255,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    playThock(keyboardSwitch);
+    playThock(keyboardSwitch, e.key);
     if (e.key === "Enter") {
       if (inputVal.trim()) {
         handleCommand(inputVal);
@@ -260,13 +264,14 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
     }
   };
 
-  if (!isTerminalOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <>
       {/* ── DRAGGABLE TERMINAL ENCLOSURE ── */}
       <div
         data-terminal-window="true"
+        onClick={() => focusWindow("terminal")}
         onWheel={(e) => e.stopPropagation()}
         style={{ left: `${position.x}px`, top: `${position.y}px` }}
         className="absolute z-50 w-full max-w-[620px] rounded-xl border border-white/20 bg-[#0B0F19]/95 backdrop-blur-2xl shadow-2xl overflow-hidden font-mono text-xs flex flex-col select-text"
@@ -282,6 +287,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
               onClick={() => {
                 playClick();
                 setTerminalOpen(false);
+                closeWindow("terminal");
               }}
               className="w-3 h-3 rounded-full bg-[#EF4444] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
               title="Close"
@@ -292,6 +298,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
               onClick={() => {
                 playClick();
                 setTerminalOpen(false);
+                minimizeWindow("terminal");
               }}
               className="w-3 h-3 rounded-full bg-[#F59E0B] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
               title="Minimize"
@@ -553,12 +560,16 @@ const SnakeGameView: React.FC<{ onExit: () => void }> = ({ onExit }) => {
       }
 
       if (e.key === "ArrowUp" || e.key.toLowerCase() === "w") {
+        playThock(undefined, e.key);
         if (dir.y === 0) setDir({ x: 0, y: -1 });
       } else if (e.key === "ArrowDown" || e.key.toLowerCase() === "s") {
+        playThock(undefined, e.key);
         if (dir.y === 0) setDir({ x: 0, y: 1 });
       } else if (e.key === "ArrowLeft" || e.key.toLowerCase() === "a") {
+        playThock(undefined, e.key);
         if (dir.x === 0) setDir({ x: -1, y: 0 });
       } else if (e.key === "ArrowRight" || e.key.toLowerCase() === "d") {
+        playThock(undefined, e.key);
         if (dir.x === 0) setDir({ x: 1, y: 0 });
       }
     };

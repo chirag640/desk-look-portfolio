@@ -112,3 +112,8 @@ body {
 .animate-pulse-slow {
   animation: pulse-slow 2.5s ease-in-out infinite;
 }
+
+/* Handwritten Typography for 3M Post-It Notes */
+.font-handwriting {
+  font-family: var(--font-caveat), "Caveat", "Architects Daughter", "Comic Sans MS", cursive, sans-serif;
+}

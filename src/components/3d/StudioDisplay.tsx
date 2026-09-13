@@ -53,6 +53,48 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
     }));
   }, []);
 
+  // Handwritten 3M Post-It texture on desk
+  const noteTexture = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      // Warm yellow post-it background
+      ctx.fillStyle = "#FEF08A";
+      ctx.fillRect(0, 0, 512, 512);
+
+      // Subtle notebook guideline lines
+      ctx.strokeStyle = "rgba(202, 138, 4, 0.22)";
+      ctx.lineWidth = 2;
+      for (let y = 140; y < 460; y += 50) {
+        ctx.beginPath();
+        ctx.moveTo(30, y);
+        ctx.lineTo(482, y);
+        ctx.stroke();
+      }
+
+      // Handwritten greeting in Caveat
+      ctx.fillStyle = "#713F12";
+      ctx.font = "italic 32px 'Caveat', cursive, sans-serif";
+      ctx.fillText("Hey! Thanks for", 40, 130);
+      ctx.fillText("visiting my studio ☕", 40, 180);
+      ctx.fillText("Hit [Z] to view display", 40, 230);
+      ctx.fillText("or play retro vinyl!", 40, 280);
+      ctx.font = "bold 36px 'Caveat', cursive, sans-serif";
+      ctx.fillText("— Chirag ✍️", 260, 350);
+
+      // Small hint at bottom
+      ctx.fillStyle = "rgba(113, 63, 18, 0.6)";
+      ctx.font = "bold 18px monospace";
+      ctx.fillText("Click to leave feedback", 40, 440);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.needsUpdate = true;
+    return tex;
+  }, []);
+
   // ScreenBar dust motes
   const dustParticles = useMemo(() => {
     return Array.from({ length: 24 }).map((_, i) => ({
@@ -438,7 +480,8 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
         <mesh castShadow receiveShadow>
           <planeGeometry args={[0.24, 0.24]} />
           <meshStandardMaterial
-            color="#FEF08A"
+            color="#FFFFFF"
+            map={noteTexture || undefined}
             roughness={0.88}
             metalness={0.0}
             polygonOffset

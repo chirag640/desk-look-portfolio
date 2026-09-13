@@ -1,6 +1,7 @@
 "use client";
 
 import { create } from "zustand";
+import { useAtmosphereStore } from "./useAtmosphereStore";
 
 export type FinderTab = "about" | "tech" | "projects" | "history" | "resume" | "contact";
 export type WindowId = "finder" | "terminal" | "music" | "notes";
@@ -63,6 +64,11 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
   openWindow: (id: WindowId) => {
     const { highestZIndex, windows } = get();
     const nextZ = highestZIndex + 1;
+    if (id === "terminal") {
+      useAtmosphereStore.getState().setTerminalOpen(true);
+    } else if (id === "notes") {
+      useAtmosphereStore.getState().setStickyNoteOpen(true);
+    }
     set({
       windows: {
         ...windows,
@@ -77,6 +83,11 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
 
   closeWindow: (id: WindowId) => {
     const { windows, activeWindow } = get();
+    if (id === "terminal") {
+      useAtmosphereStore.getState().setTerminalOpen(false);
+    } else if (id === "notes") {
+      useAtmosphereStore.getState().setStickyNoteOpen(false);
+    }
     set({
       windows: {
         ...windows,
@@ -88,6 +99,11 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
 
   minimizeWindow: (id: WindowId) => {
     const { windows, activeWindow } = get();
+    if (id === "terminal") {
+      useAtmosphereStore.getState().setTerminalOpen(false);
+    } else if (id === "notes") {
+      useAtmosphereStore.getState().setStickyNoteOpen(false);
+    }
     set({
       windows: {
         ...windows,

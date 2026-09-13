@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Check, Trash2, Pin, MessageSquare, Sparkles } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
+import { useWindowManager } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 interface SavedNote {
@@ -14,7 +15,16 @@ interface SavedNote {
 
 export const StickyNoteModal: React.FC = () => {
   const { isStickyNoteOpen, setStickyNoteOpen } = useAtmosphereStore();
+  const { windows, closeWindow } = useWindowManager();
   const { playClick, playPaperRustle } = useSoundEffects();
+
+  const isOpen = isStickyNoteOpen || (windows.notes?.isOpen && !windows.notes?.isMinimized);
+
+  const handleClose = () => {
+    playClick();
+    setStickyNoteOpen(false);
+    closeWindow("notes");
+  };
 
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
@@ -61,7 +71,7 @@ export const StickyNoteModal: React.FC = () => {
     } catch {}
   };
 
-  if (!isStickyNoteOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <div
@@ -74,7 +84,7 @@ export const StickyNoteModal: React.FC = () => {
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 bg-white/50 backdrop-blur-md border border-white/60 rounded-sm transform rotate-1 shadow-sm pointer-events-none" />
 
         {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-yellow-300/80 pb-3 mb-4">
+        <div className="flex items-center justify-between border-b border-yellow-300/80 pb-2.5 mb-3">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-yellow-400 flex items-center justify-center text-yellow-900 shadow-inner">
               <Pin className="w-3.5 h-3.5" />
@@ -84,21 +94,31 @@ export const StickyNoteModal: React.FC = () => {
                 DESK SCRATCHPAD · 3M NOTE
               </h3>
               <p className="text-[10px] text-yellow-800/80 font-mono">
-                Leave a quick thought or feedback for Chirag
+                Pinned to walnut studio desk · Gandhinagar
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => {
-              playClick();
-              setStickyNoteOpen(false);
-            }}
+            onClick={handleClose}
             className="w-7 h-7 rounded-full bg-yellow-300/80 hover:bg-yellow-400 text-yellow-900 flex items-center justify-center transition-colors cursor-pointer"
             title="Close Note"
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+
+        {/* ── CHIRAG'S HANDWRITTEN WELCOME GREETING ── */}
+        <div className="p-3.5 mb-3.5 rounded-xl bg-yellow-300/50 border border-yellow-400/60 shadow-sm relative overflow-hidden">
+          <p className="font-handwriting text-xl sm:text-2xl text-yellow-950 leading-relaxed drop-shadow-sm font-medium">
+            &ldquo;Hey! Thanks for visiting my studio. Grab a coffee ☕, hit [Z] to view the display, or play some retro vinyl tracks. Feel free to leave a note or feedback below!&rdquo;
+          </p>
+          <div className="flex items-center justify-between pt-2 border-t border-yellow-400/30 mt-2">
+            <span className="text-[10px] font-mono text-yellow-800/70">3M Studio Desk Note</span>
+            <span className="font-handwriting text-lg sm:text-xl text-yellow-900 font-bold tracking-wide">
+              — Chirag ✍️
+            </span>
+          </div>
         </div>
 
         {/* Note Form */}
@@ -115,11 +135,11 @@ export const StickyNoteModal: React.FC = () => {
 
           <div>
             <textarea
-              rows={4}
-              placeholder="Write a quick message or note for Chirag..."
+              rows={3}
+              placeholder="Write your note or feedback for Chirag..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full p-3 rounded-lg bg-yellow-200/50 border border-yellow-300 text-xs text-yellow-950 placeholder:text-yellow-700/60 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none font-sans leading-relaxed"
+              className="w-full p-3 rounded-lg bg-yellow-200/60 border border-yellow-300 text-base font-handwriting text-yellow-950 placeholder:text-yellow-800/50 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none leading-relaxed"
             />
           </div>
 

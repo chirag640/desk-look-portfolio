@@ -165,12 +165,21 @@ class AudioEngine {
     } catch {}
   }
 
-  // Mechanical Keyboard Acoustic Switch Synthesis
-  playThock(customSwitch?: string) {
+  // Mechanical Keyboard Acoustic Switch Synthesis with Natural Pitch Modulation
+  playThock(customSwitch?: string, keyName?: string) {
     const ctx = this.getContext();
     if (!ctx) return;
     const sw = customSwitch || (window as any)?.__KEYBOARD_SWITCH || "boba_u4t";
     const t = ctx.currentTime;
+
+    // Organic keypress acoustic variance: ±8% subtle pitch randomness
+    const variance = 0.94 + Math.random() * 0.12;
+    const isSpace = keyName === " ";
+    const isEnter = keyName === "Enter" || keyName === "Return";
+
+    // Spacebar has deeper body resonance; Enter has crisper snap
+    const keyPitchMultiplier = isSpace ? 0.8 : isEnter ? 1.08 : 1.0;
+    const pMod = variance * keyPitchMultiplier;
 
     try {
       if (sw === "cherry_blue") {
@@ -178,8 +187,8 @@ class AudioEngine {
         const clickOsc = ctx.createOscillator();
         const clickGain = ctx.createGain();
         clickOsc.type = "sine";
-        clickOsc.frequency.setValueAtTime(2400, t);
-        clickOsc.frequency.exponentialRampToValueAtTime(650, t + 0.018);
+        clickOsc.frequency.setValueAtTime(2400 * pMod, t);
+        clickOsc.frequency.exponentialRampToValueAtTime(650 * pMod, t + 0.018);
         clickGain.gain.setValueAtTime(0.09, t);
         clickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.02);
         clickOsc.connect(clickGain);
@@ -190,9 +199,9 @@ class AudioEngine {
         const bodyOsc = ctx.createOscillator();
         const bodyGain = ctx.createGain();
         bodyOsc.type = "triangle";
-        bodyOsc.frequency.setValueAtTime(450, t);
-        bodyOsc.frequency.exponentialRampToValueAtTime(200, t + 0.035);
-        bodyGain.gain.setValueAtTime(0.04, t);
+        bodyOsc.frequency.setValueAtTime(450 * pMod, t);
+        bodyOsc.frequency.exponentialRampToValueAtTime(200 * pMod, t + 0.035);
+        bodyGain.gain.setValueAtTime(isSpace ? 0.06 : 0.04, t);
         bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
         bodyOsc.connect(bodyGain);
         bodyGain.connect(ctx.destination);
@@ -204,12 +213,12 @@ class AudioEngine {
         const gain = ctx.createGain();
         const filter = ctx.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.setValueAtTime(950, t);
+        filter.frequency.setValueAtTime(950 * pMod, t);
 
         osc.type = "triangle";
-        osc.frequency.setValueAtTime(420, t);
-        osc.frequency.exponentialRampToValueAtTime(140, t + 0.04);
-        gain.gain.setValueAtTime(0.08, t);
+        osc.frequency.setValueAtTime(420 * pMod, t);
+        osc.frequency.exponentialRampToValueAtTime(140 * pMod, t + 0.04);
+        gain.gain.setValueAtTime(isSpace ? 0.1 : 0.08, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
 
         osc.connect(filter);
@@ -223,12 +232,12 @@ class AudioEngine {
         const gain = ctx.createGain();
         const filter = ctx.createBiquadFilter();
         filter.type = "lowpass";
-        filter.frequency.setValueAtTime(480, t);
+        filter.frequency.setValueAtTime(480 * pMod, t);
 
         osc.type = "triangle";
-        osc.frequency.setValueAtTime(140, t);
-        osc.frequency.exponentialRampToValueAtTime(42, t + 0.06);
-        gain.gain.setValueAtTime(0.12, t);
+        osc.frequency.setValueAtTime(140 * pMod, t);
+        osc.frequency.exponentialRampToValueAtTime(42 * pMod, t + 0.06);
+        gain.gain.setValueAtTime(isSpace ? 0.15 : 0.12, t);
         gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
 
         osc.connect(filter);
@@ -529,9 +538,9 @@ export function useSoundEffects() {
     audioEngine.playMacTrash();
   }, [soundEnabled]);
 
-  const playThock = useCallback((customSwitch?: string) => {
+  const playThock = useCallback((customSwitch?: string, keyName?: string) => {
     if (!soundEnabled) return;
-    audioEngine.playThock(customSwitch);
+    audioEngine.playThock(customSwitch, keyName);
   }, [soundEnabled]);
 
   const playMug = useCallback(() => {
