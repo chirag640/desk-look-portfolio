@@ -22,14 +22,13 @@ export const Experience: React.FC<ExperienceProps> = ({
   isZoomedIn = true
 }) => {
   return (
-    <div className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none">
+    <div className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none bg-[#070A10]">
       <Canvas
         shadows={!isMobile}
         dpr={[1, isMobile ? 1.0 : 1.25]}
         gl={{
           antialias: true,
           powerPreference: "high-performance",
-          alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0
         }}
@@ -40,6 +39,7 @@ export const Experience: React.FC<ExperienceProps> = ({
           far: 50
         }}
       >
+        <color attach="background" args={["#070A10"]} />
         <Suspense fallback={null}>
           <CameraRig
             progress={progress}

@@ -157,37 +157,37 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── 4. FLOATING VIEW SWITCHER & SIDECAR LAUNCHER ── */}
-      <div className="fixed bottom-3 right-4 z-40 flex items-center gap-2">
-        {/* MacBook Sidecar Quick Jump Button */}
-        <button
-          onClick={() => {
-            setCameraView(cameraView === "macbook" ? "screen" : "macbook");
-          }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl backdrop-blur-md transition-all cursor-pointer ${
-            cameraView === "macbook"
-              ? "bg-[#0284C7]/30 border-[#38BDF8] text-[#38BDF8]"
-              : "bg-[#131823]/90 hover:bg-[#1A2234] border-white/15 text-slate-300 hover:text-white"
-          }`}
-          title="Open MacBook Pro M3 Sidecar Playground"
-        >
-          <span>💻 Sidecar [Dart & GitHub]</span>
-        </button>
+      {/* ── 4. FLOATING VIEW SWITCHER & SIDECAR LAUNCHER (ONLY IN 3D DESK / SIDECAR VIEW) ── */}
+      {!isFocusedOnScreen && (
+        <div className="fixed bottom-3 right-4 z-40 flex items-center gap-2">
+          {/* MacBook Sidecar Quick Jump Button */}
+          <button
+            onClick={() => {
+              setCameraView(cameraView === "macbook" ? "screen" : "macbook");
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono shadow-xl backdrop-blur-md transition-all cursor-pointer ${
+              cameraView === "macbook"
+                ? "bg-[#0284C7]/30 border-[#38BDF8] text-[#38BDF8]"
+                : "bg-[#131823]/90 hover:bg-[#1A2234] border-white/15 text-slate-300 hover:text-white"
+            }`}
+            title="Open MacBook Pro M3 Sidecar Playground"
+          >
+            <span>💻 Sidecar [Dart & GitHub]</span>
+          </button>
 
-        {/* View Zoom Switcher Button */}
-        <button
-          onClick={handleToggleZoom}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#131823]/90 hover:bg-[#1A2234] border border-white/15 text-xs font-mono text-slate-300 hover:text-white shadow-xl backdrop-blur-md transition-all cursor-pointer"
-        >
-          <span>
-            {cameraView === "macbook"
-              ? "Return to Screen [Z]"
-              : isFocusedOnScreen
-              ? "View 3D Studio Desk [Z]"
-              : "Enter MacBook Screen [Z]"}
-          </span>
-        </button>
-      </div>
+          {/* View Zoom Switcher Button */}
+          <button
+            onClick={handleToggleZoom}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#131823]/90 hover:bg-[#1A2234] border border-white/15 text-xs font-mono text-slate-300 hover:text-white shadow-xl backdrop-blur-md transition-all cursor-pointer"
+          >
+            <span>
+              {cameraView === "macbook"
+                ? "Return to Screen [Z]"
+                : "Enter MacBook Screen [Z]"}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* ── 5. 3M YELLOW STICKY NOTE MODAL SCRATCHPAD ── */}
       <StickyNoteModal />
