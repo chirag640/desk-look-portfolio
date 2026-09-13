@@ -90,8 +90,8 @@ export default function Home() {
   }, [cameraView, setCameraView]);
 
   return (
-    <main className="relative w-full h-screen bg-[#0B0E14] overflow-hidden select-none font-sans">
-      {/* ── 1. 3D STUDIO WORKSTATION BACKGROUND ── */}
+    <main className="relative w-full h-screen bg-[#07090E] overflow-hidden select-none font-sans">
+      {/* ── 1. 3D STUDIO WORKSTATION (PHOTOREALISTIC APPLE MAC & DESK) ── */}
       {mounted && hasWebGL && (
         <Experience3D
           progress={progress}
@@ -104,31 +104,26 @@ export default function Home() {
       {/* WebGL Fallback Notification if unavailable */}
       {!hasWebGL && <WebGLFallbackNotice />}
 
-      {/* ── 2. APPLE STUDIO DISPLAY FRAME & INSIDE-THE-SCREEN VIEWPORT ── */}
+      {/* ── 2. IMMERSIVE CHIRAGOS SCREEN VIEWPORT (ACTIVE WHEN SCREEN-FOCUSED) ── */}
       <div
-        className={`absolute inset-0 z-20 flex items-center justify-center transition-[transform,opacity] duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity] transform-gpu p-2 sm:p-6 md:p-8 ${
+        className={`absolute inset-0 z-20 flex items-center justify-center p-1 sm:p-4 md:p-6 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           isFocusedOnScreen
-            ? "scale-100 opacity-100 pointer-events-auto"
-            : cameraView === "macbook"
-            ? "scale-[0.62] translate-x-44 translate-y-12 opacity-30 pointer-events-none"
-            : "scale-[0.78] translate-y-6 shadow-2xl opacity-90 pointer-events-auto"
+            ? "opacity-100 scale-100 pointer-events-auto"
+            : "opacity-0 scale-[0.96] pointer-events-none"
         }`}
       >
-        {/* Apple Studio Display Aluminum Monitor Bezel Frame */}
-        <div className="relative w-full max-w-[1440px] h-[92vh] max-h-[920px] rounded-[24px] bg-[#0A0D14] p-3 sm:p-4 border-[6px] sm:border-[8px] border-[#334155] os-screen-bezel flex flex-col shadow-2xl transition-all">
+        {/* Authentic Apple Liquid Retina Display Bezel Frame */}
+        <div className="relative w-full max-w-[1480px] h-[94vh] max-h-[960px] rounded-[20px] sm:rounded-[26px] bg-[#0A0D14] p-2.5 sm:p-3.5 border-2 sm:border-[3px] border-[#2A3444] shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden">
           {/* Top Bezel Center Camera Notch */}
-          <div className="absolute top-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-50 pointer-events-none">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1E293B] border border-black/80 flex items-center justify-center">
-              <span className="w-1 h-1 rounded-full bg-[#0284C7]/60" />
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-50 pointer-events-none">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#151C28] border border-black/80 flex items-center justify-center">
+              <span className="w-1 h-1 rounded-full bg-[#0284C7]/70" />
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]/40" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]/60" />
           </div>
 
-          {/* Top ScreenBar Light Fixture (Visual Accent) */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-48 sm:w-72 h-2.5 rounded-full bg-[#1E293B] border border-white/20 shadow-[0_4px_16px_rgba(254,243,199,0.3)] z-50 pointer-events-none" />
-
           {/* ── INSIDE THE SCREEN: VIRTUAL DESKTOP SPACES ── */}
-          <div className="relative flex-1 w-full h-full rounded-[14px] overflow-hidden bg-[#0B0E14] border border-white/10">
+          <div className="relative flex-1 w-full h-full rounded-[14px] sm:rounded-[18px] overflow-hidden bg-[#090C12] border border-white/10">
             <ScreenSpacesContainer
               progress={progress}
               onScrollToProgress={scrollTo}
@@ -136,15 +131,29 @@ export default function Home() {
               onToggleZoom={handleToggleZoom}
             />
           </div>
-
-          {/* Bottom Monitor Bezel Center Apple Logo Placeholder */}
-          <div className="h-3 flex items-center justify-center pt-1">
-            <div className="w-3 h-3 rounded-full bg-white/15" />
-          </div>
         </div>
       </div>
 
-      {/* Floating View Switcher & Sidecar Quick Launcher Buttons */}
+      {/* ── 3. DESK VIEW PROMPT: ENTER CHIRAGOS CALL-TO-ACTION ── */}
+      {!isFocusedOnScreen && cameraView !== "macbook" && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-bounce-subtle pointer-events-auto">
+          <button
+            onClick={() => setCameraView("screen")}
+            className="group flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#131823]/90 hover:bg-[#1C2436] border border-[#38BDF8]/40 hover:border-[#38BDF8] text-white shadow-[0_10px_30px_rgba(2,132,199,0.3)] backdrop-blur-md transition-all cursor-pointer text-sm font-medium"
+          >
+            <span className="text-base text-[#38BDF8]"></span>
+            <span>Enter ChiragOS Workstation</span>
+            <span className="text-xs px-2 py-0.5 rounded-md bg-white/10 text-slate-300 font-mono">
+              [Z]
+            </span>
+          </button>
+          <span className="text-[11px] text-slate-400 font-mono tracking-wide">
+            Click anywhere on the Mac or desk to interact
+          </span>
+        </div>
+      )}
+
+      {/* ── 4. FLOATING VIEW SWITCHER & SIDECAR LAUNCHER ── */}
       <div className="fixed bottom-3 right-4 z-40 flex items-center gap-2">
         {/* MacBook Sidecar Quick Jump Button */}
         <button
@@ -171,15 +180,15 @@ export default function Home() {
               ? "Return to Screen [Z]"
               : isFocusedOnScreen
               ? "View 3D Studio Desk [Z]"
-              : "Zoom into Screen [Z]"}
+              : "Enter ChiragOS [Z]"}
           </span>
         </button>
       </div>
 
-      {/* ── 3. 3M YELLOW STICKY NOTE MODAL SCRATCHPAD ── */}
+      {/* ── 5. 3M YELLOW STICKY NOTE MODAL SCRATCHPAD ── */}
       <StickyNoteModal />
 
-      {/* ── 4. MACBOOK PRO SIDECAR LIVE CODE & GITHUB MODAL ── */}
+      {/* ── 6. MACBOOK PRO SIDECAR LIVE CODE & GITHUB MODAL ── */}
       <MacBookScreenContent />
     </main>
   );

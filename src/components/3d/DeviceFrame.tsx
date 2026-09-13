@@ -250,8 +250,8 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({ progress, isMobile = f
   return (
     <group
       ref={phoneGroupRef}
-      position={[0.78, -0.42, 0.48]}
-      rotation={[-0.22, -0.26, 0]}
+      position={[1.52, -0.42, 0.28]}
+      rotation={[-0.15, -0.35, 0]}
       scale={0.34}
       onClick={(e) => {
         e.stopPropagation();
