@@ -5,6 +5,36 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 
+function createPRNG(seed = 42) {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+const COUNT = 80;
+const prngRain = createPRNG(12345);
+const RAIN_DATA = Array.from({ length: COUNT }).map(() => ({
+  x: (prngRain() - 0.5) * 11.5,
+  y: 0.2 + prngRain() * 5.0,
+  speed: 0.9 + prngRain() * 1.7,
+  length: 0.12 + prngRain() * 0.24,
+  wobbleSpeed: 2 + prngRain() * 3,
+  wobblePhase: prngRain() * Math.PI * 2
+}));
+
+const prngBokeh = createPRNG(67890);
+const BOKEH_LIGHTS = Array.from({ length: 32 }).map((_, i) => ({
+  id: i,
+  x: (prngBokeh() - 0.5) * 10.5,
+  y: -0.4 + prngBokeh() * 3.6,
+  radius: 0.04 + prngBokeh() * 0.08,
+  color: i % 4 === 0 ? "#38BDF8" : i % 3 === 0 ? "#FBBF24" : i % 2 === 0 ? "#F43F5E" : "#A78BFA",
+  twinkleSpeed: 0.8 + prngBokeh() * 1.5,
+  twinklePhase: prngBokeh() * Math.PI * 2
+}));
+
 export const RainWindow: React.FC = () => {
   const { lightingMood } = useAtmosphereStore();
   const isRainy = lightingMood === "rain";
@@ -13,34 +43,8 @@ export const RainWindow: React.FC = () => {
   const streaksRef = useRef<THREE.InstancedMesh>(null);
   const dropletsRef = useRef<THREE.InstancedMesh>(null);
 
-  const COUNT = 80;
-
-  // Initial random properties for each raindrop streak
-  const rainData = useMemo(() => {
-    return Array.from({ length: COUNT }).map((_, i) => ({
-      x: (Math.random() - 0.5) * 11.5,
-      y: 0.2 + Math.random() * 5.0,
-      speed: 0.9 + Math.random() * 1.7,
-      length: 0.12 + Math.random() * 0.24,
-      wobbleSpeed: 2 + Math.random() * 3,
-      wobblePhase: Math.random() * Math.PI * 2
-    }));
-  }, []);
-
-  // Distant city night bokeh lights
-  const bokehLights = useMemo(() => {
-    return Array.from({ length: 32 }).map((_, i) => ({
-      id: i,
-      x: (Math.random() - 0.5) * 10.5,
-      y: -0.4 + Math.random() * 3.6,
-      radius: 0.04 + Math.random() * 0.08,
-      color: i % 4 === 0 ? "#38BDF8" : i % 3 === 0 ? "#FBBF24" : i % 2 === 0 ? "#F43F5E" : "#A78BFA",
-      twinkleSpeed: 0.8 + Math.random() * 1.5,
-      twinklePhase: Math.random() * Math.PI * 2
-    }));
-  }, []);
-
   const dummy = useMemo(() => new THREE.Object3D(), []);
+
 
   useFrame(({ clock }) => {
     const elapsed = clock.getElapsedTime();
@@ -58,7 +62,7 @@ export const RainWindow: React.FC = () => {
     }
 
     // Animate each raindrop streak sliding down the glass
-    rainData.forEach((d, i) => {
+    RAIN_DATA.forEach((d, i) => {
       const curY = (d.y - elapsed * d.speed) % 5.2;
       const actualY = (curY < 0 ? curY + 5.2 : curY) - 0.4;
       const actualX = d.x + Math.sin(elapsed * d.wobbleSpeed + d.wobblePhase) * 0.02;
@@ -95,7 +99,7 @@ export const RainWindow: React.FC = () => {
 
       {/* Distant City Skyline Bokeh Points */}
       <group position={[0, 0, -0.15]}>
-        {bokehLights.map((b) => (
+        {BOKEH_LIGHTS.map((b) => (
           <mesh key={b.id} position={[b.x, b.y, 0]}>
             <circleGeometry args={[b.radius, 16]} />
             <meshBasicMaterial

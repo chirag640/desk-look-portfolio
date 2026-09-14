@@ -194,12 +194,12 @@ export const MacOSLockScreen: React.FC = () => {
           {dateStr}
         </div>
 
-        {/* Massive SF Digital Clock */}
-        <div className="flex items-baseline justify-center">
-          <h1 className="text-7xl sm:text-9xl md:text-[130px] font-extralight tracking-tighter text-white font-sans drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)] select-none">
+        {/* Massive SF Digital Clock (Semantic Timer Element) */}
+        <div className="flex items-baseline justify-center" role="timer" aria-label={`Current time ${timeStr}:${secondsStr}`}>
+          <div className="text-7xl sm:text-9xl md:text-[130px] font-extralight tracking-tighter text-white font-sans drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)] select-none">
             {timeStr}
-          </h1>
-          <span className="text-xl sm:text-3xl font-mono text-sky-400/80 ml-2 drop-shadow">
+          </div>
+          <span className="text-xl sm:text-3xl font-mono text-sky-400/80 ml-2 drop-shadow" aria-hidden="true">
             :{secondsStr}
           </span>
         </div>

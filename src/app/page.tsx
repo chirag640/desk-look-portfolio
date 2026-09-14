@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useCallback, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
 import { ScreenSpacesContainer } from "@/components/screen-spaces/ScreenSpacesContainer";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useResponsive } from "@/hooks/useMediaQuery";
-import { useSoundStore } from "@/hooks/useSoundEffects";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { isWebGLAvailable } from "@/lib/webgl";
 import { WebGLFallbackNotice } from "@/ui/WebGLFallback";
@@ -24,19 +23,14 @@ const Experience3D = dynamic(
 export default function Home() {
   const { progress, scrollTo } = useScrollProgress();
   const { isMobile, prefersReducedMotion } = useResponsive();
-  const { toggleSound } = useSoundStore();
-  const [hasWebGL, setHasWebGL] = useState(true);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const hasWebGL = isClient ? isWebGLAvailable() : true;
   const { cameraView, setCameraView } = useAtmosphereStore();
   const isFocusedOnScreen = cameraView === "screen";
-
-  useEffect(() => {
-    setMounted(true);
-    setHasWebGL(isWebGLAvailable());
-
-    // Sound toggle hook
-    (window as unknown as { __SOUND_TOGGLE?: () => void }).__SOUND_TOGGLE = toggleSound;
-  }, [toggleSound]);
 
   // Keyboard navigation & zoom toggle [Z]
   useEffect(() => {
@@ -58,6 +52,25 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [cameraView, setCameraView]);
 
+  // Deep-linking hash URL slug handler (#about, #skills, #projects, etc.)
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (!hash) return;
+      setCameraView("screen");
+      if (hash === "#about") scrollTo(0.22);
+      else if (hash === "#skills" || hash === "#tech") scrollTo(0.39);
+      else if (hash === "#projects") scrollTo(0.60);
+      else if (hash === "#experience" || hash === "#timeline") scrollTo(0.78);
+      else if (hash === "#resume") scrollTo(0.88);
+      else if (hash === "#contact") scrollTo(0.98);
+    };
+
+    handleHash();
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, [scrollTo, setCameraView]);
+
   const handleToggleZoom = useCallback(() => {
     if (cameraView === "macbook") {
       setCameraView("screen");
@@ -67,9 +80,31 @@ export default function Home() {
   }, [cameraView, setCameraView]);
 
   return (
-    <main className="relative w-full h-screen bg-[#07090E] overflow-hidden select-none font-sans">
+    <main id="main-content" className="relative w-full h-screen bg-[#07090E] overflow-hidden select-none font-sans">
+      {/* ── ACCESSIBILITY & SEARCH ENGINE CRAWLER DIRECTORY ── */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[999] focus:px-4 focus:py-2 focus:bg-sky-500 focus:text-white focus:rounded-md focus:shadow-lg focus:outline-none font-mono text-xs"
+      >
+        Skip to main content
+      </a>
+
+      {/* Semantic Crawl Links for Googlebot & Screen Readers */}
+      <nav aria-label="Portfolio Sections Directory" className="sr-only">
+        <h1 className="text-xl font-bold">Chirag Chaudhary — Software Engineer | 3D Interactive Portfolio</h1>
+        <p>Software Engineer at Tata Consultancy Services (TCS) &amp; creator of flutter_blueprint on Pub.dev. Building enterprise mobile architectures, full-stack systems, and developer tooling.</p>
+        <ul>
+          <li><a href="#about">About Chirag Chaudhary &amp; TCS Experience</a></li>
+          <li><a href="#skills">Technical Architecture &amp; Arsenal (Flutter, Dart, NestJS, Next.js)</a></li>
+          <li><a href="#projects">Featured Projects (flutter_blueprint, FinFlow Ecosystem)</a></li>
+          <li><a href="#experience">Engineering Career Timeline &amp; TCS Digital Trajectory</a></li>
+          <li><a href="#resume">Verified Resume &amp; Credentials</a></li>
+          <li><a href="#contact">Contact &amp; Social Links (GitHub, LinkedIn, Email)</a></li>
+        </ul>
+      </nav>
+
       {/* ── 1. ARCHITECTURAL APPLE MINIMALIST STUDIO (3D BACKGROUND ENVIRONMENT) ── */}
-      {mounted && hasWebGL && (
+      {isClient && hasWebGL && (
         <Experience3D
           progress={progress}
           isZoomedIn={isFocusedOnScreen}
@@ -105,12 +140,7 @@ export default function Home() {
 
           {/* ── INSIDE THE SCREEN: VIRTUAL DESKTOP SPACES ── */}
           <div className="relative flex-1 w-full h-full rounded-[14px] sm:rounded-[18px] overflow-hidden bg-[#080B11] border border-white/10">
-            <ScreenSpacesContainer
-              progress={progress}
-              onScrollToProgress={scrollTo}
-              isZoomedIn={isFocusedOnScreen}
-              onToggleZoom={handleToggleZoom}
-            />
+            <ScreenSpacesContainer />
           </div>
         </div>
       </div>

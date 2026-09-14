@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable react-hooks/immutability */
 
 import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
@@ -6,7 +7,7 @@ import * as THREE from "three";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 
 interface CameraRigProps {
-  progress: number;
+  progress?: number;
   isMobile?: boolean;
   reducedMotion?: boolean;
   isZoomedIn?: boolean;

@@ -1,6 +1,7 @@
 "use client";
+/* eslint-disable react-hooks/refs */
 
-import React, { useRef, useMemo, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -20,28 +21,30 @@ const SPACE_COLORS = [
   { primary: "#10B981", title: "Quick Contact", tag: "● AVAILABLE NOW" }
 ];
 
-export const DeviceFrame: React.FC<DeviceFrameProps> = ({ progress, isMobile = false }) => {
+export const DeviceFrame: React.FC<DeviceFrameProps> = ({ progress }) => {
   const phoneGroupRef = useRef<THREE.Group>(null);
   const { playClick } = useSoundEffects();
 
   const activeSpace = Math.max(0, Math.min(6, Math.round(progress * 6)));
 
-  // Offscreen canvas and texture for dynamic screen drawing
-  const { canvas, texture } = useMemo(() => {
-    if (typeof window === "undefined") {
-      return { canvas: null, texture: null };
-    }
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const textureRef = useRef<THREE.CanvasTexture | null>(null);
+
+  if (typeof window !== "undefined" && !canvasRef.current) {
     const c = document.createElement("canvas");
     c.width = 480;
     c.height = 960;
+    canvasRef.current = c;
     const tex = new THREE.CanvasTexture(c);
     tex.minFilter = THREE.LinearFilter;
     tex.magFilter = THREE.LinearFilter;
-    return { canvas: c, texture: tex };
-  }, []);
+    textureRef.current = tex;
+  }
 
   // Redraw canvas texture whenever active space changes
   useEffect(() => {
+    const canvas = canvasRef.current;
+    const texture = textureRef.current;
     if (!canvas || !texture) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -236,8 +239,10 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({ progress, isMobile = f
     ctx.roundRect(170, 925, 140, 6, 3);
     ctx.fill();
 
-    texture.needsUpdate = true;
-  }, [activeSpace, canvas, texture]);
+    if (texture) {
+      texture.needsUpdate = true;
+    }
+  }, [activeSpace]);
 
   useFrame(({ clock }) => {
     const elapsed = clock.getElapsedTime();
@@ -289,8 +294,8 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({ progress, isMobile = f
       {/* ── SCREEN GLASS WITH DYNAMIC FLUTTER UI TEXTURE ── */}
       <mesh position={[0, 0, 0.034]}>
         <planeGeometry args={[0.82, 1.68]} />
-        {texture ? (
-          <meshBasicMaterial map={texture} toneMapped={false} />
+        {textureRef.current ? (
+          <meshBasicMaterial map={textureRef.current} toneMapped={false} />
         ) : (
           <meshStandardMaterial color="#0B0F19" emissive="#3B82F6" roughness={0.1} />
         )}

@@ -24,22 +24,10 @@ import {
   Terminal
 } from "lucide-react";
 
-interface ScreenSpacesContainerProps {
-  progress?: number;
-  onScrollToProgress?: (p: number) => void;
-  isZoomedIn?: boolean;
-  onToggleZoom?: () => void;
-}
-
-export const ScreenSpacesContainer: React.FC<ScreenSpacesContainerProps> = ({
-  progress = 0,
-  onScrollToProgress,
-  isZoomedIn = true,
-  onToggleZoom
-}) => {
+export const ScreenSpacesContainer: React.FC = () => {
   const { wallpaperTheme, toggleTerminal } = useAtmosphereStore();
   const { openWindow, setFinderTab, closeAllMenus } = useWindowManager();
-  const { playClick, playMacPop, playMacSwoosh } = useSoundEffects();
+  const { playMacPop, playMacSwoosh } = useSoundEffects();
 
   // Soothing macOS Sequoia wallpapers
   const wallpaperStyles: Record<WallpaperTheme, { bg: string; orb1: string; orb2: string }> = {

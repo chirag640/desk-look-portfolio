@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { githubRepositories, personalData } from "@/data/social";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
-import { FileText, Download, ExternalLink, GitBranch, Star, GitFork, Radio, Box, Search } from "lucide-react";
+import { FileText, Download, ExternalLink, Star, Box, Search } from "lucide-react";
 import { GithubIcon } from "@/ui/BrandIcons";
 
 export const RepoResumeSpace: React.FC = () => {

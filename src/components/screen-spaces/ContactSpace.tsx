@@ -4,15 +4,15 @@ import React, { useState } from "react";
 import { personalData } from "@/data/social";
 import { Button } from "@/ui/Button";
 import { Badge } from "@/ui/Badge";
-import { Mail, Send, CheckCircle2, ArrowUp, MessageSquare, Box } from "lucide-react";
+import { Mail, Send, CheckCircle2, MessageSquare, Box } from "lucide-react";
 import { GithubIcon, LinkedinIcon } from "@/ui/BrandIcons";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 
-interface ContactSpaceProps {
-  onNavigateSpace: (spaceIndex: number) => void;
+export interface ContactSpaceProps {
+  onNavigateSpace?: (idx: number) => void;
 }
 
-export const ContactSpace: React.FC<ContactSpaceProps> = ({ onNavigateSpace }) => {
+export const ContactSpace: React.FC<ContactSpaceProps> = () => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const { playClick, playWindowOpen } = useSoundEffects();

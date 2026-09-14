@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { create } from "zustand";
 
 interface SoundStore {
@@ -169,7 +169,7 @@ class AudioEngine {
   playThock(customSwitch?: string, keyName?: string) {
     const ctx = this.getContext();
     if (!ctx) return;
-    const sw = customSwitch || (window as any)?.__KEYBOARD_SWITCH || "boba_u4t";
+    const sw = customSwitch || (typeof window !== "undefined" ? (window as unknown as { __KEYBOARD_SWITCH?: string }).__KEYBOARD_SWITCH : undefined) || "boba_u4t";
     const t = ctx.currentTime;
 
     // Organic keypress acoustic variance: ±8% subtle pitch randomness

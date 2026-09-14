@@ -15,6 +15,34 @@ interface StudioDisplayProps {
   isZoomedIn?: boolean;
 }
 
+function createPRNG(seed = 42) {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+const prngSteam = createPRNG(13579);
+const STEAM_PARTICLES = Array.from({ length: 9 }).map((_, i) => ({
+  id: i,
+  speed: 0.18 + prngSteam() * 0.12,
+  xOffset: (prngSteam() - 0.5) * 0.05,
+  zOffset: (prngSteam() - 0.5) * 0.05,
+  curlSpeed: 1.5 + prngSteam() * 1.5,
+  phase: i * 0.7
+}));
+
+const prngDust = createPRNG(24680);
+const DUST_PARTICLES = Array.from({ length: 24 }).map((_, i) => ({
+  id: i,
+  baseX: (prngDust() - 0.5) * 2.2,
+  baseY: -0.2 + prngDust() * 1.2,
+  baseZ: (prngDust() - 0.5) * 0.9,
+  speed: 0.04 + prngDust() * 0.05,
+  phase: prngDust() * Math.PI * 2
+}));
+
 export const StudioDisplay: React.FC<StudioDisplayProps> = ({
   progress,
   isMobile = false
@@ -41,17 +69,6 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
 
   const [steamPuff, setSteamPuff] = useState(0);
 
-  // Steam particle initial offsets
-  const steamParticles = useMemo(() => {
-    return Array.from({ length: 9 }).map((_, i) => ({
-      id: i,
-      speed: 0.18 + Math.random() * 0.12,
-      xOffset: (Math.random() - 0.5) * 0.05,
-      zOffset: (Math.random() - 0.5) * 0.05,
-      curlSpeed: 1.5 + Math.random() * 1.5,
-      phase: i * 0.7
-    }));
-  }, []);
 
   // Handwritten 3M Post-It texture on desk
   const noteTexture = useMemo(() => {
@@ -93,18 +110,6 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
     const tex = new THREE.CanvasTexture(canvas);
     tex.needsUpdate = true;
     return tex;
-  }, []);
-
-  // ScreenBar dust motes
-  const dustParticles = useMemo(() => {
-    return Array.from({ length: 24 }).map((_, i) => ({
-      id: i,
-      baseX: (Math.random() - 0.5) * 2.2,
-      baseY: -0.2 + Math.random() * 1.2,
-      baseZ: (Math.random() - 0.5) * 0.9,
-      speed: 0.04 + Math.random() * 0.05,
-      phase: Math.random() * Math.PI * 2
-    }));
   }, []);
 
   // Architectural walnut acoustic wall slats data
@@ -158,7 +163,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
     }
 
     // 4. Steaming Coffee Mug Particles Rising
-    steamParticles.forEach((p, i) => {
+    STEAM_PARTICLES.forEach((p, i) => {
       const mesh = steamRefs.current[i];
       if (mesh) {
         const cycle = (elapsed * p.speed + p.phase) % 1.0;
@@ -173,7 +178,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
     });
 
     // 5. Cozy ScreenBar Dust Motes
-    dustParticles.forEach((d, i) => {
+    DUST_PARTICLES.forEach((d, i) => {
       const mesh = dustRefs.current[i];
       if (mesh) {
         mesh.position.y =
@@ -427,7 +432,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
       </group>
 
       {/* Steam Particles Rising from Coffee */}
-      {steamParticles.map((p, i) => (
+      {STEAM_PARTICLES.map((p, i) => (
         <mesh
           key={p.id}
           ref={(el) => {
@@ -441,7 +446,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
       ))}
 
       {/* ── 8. SCREENBAR LIGHT DUST MOTES (COZY FLOATING PARTICLES) ── */}
-      {dustParticles.map((d, i) => (
+      {DUST_PARTICLES.map((d, i) => (
         <mesh
           key={d.id}
           ref={(el) => {

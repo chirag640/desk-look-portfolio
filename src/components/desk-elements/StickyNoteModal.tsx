@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { X, Check, Trash2, Pin, MessageSquare, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { X, Sparkles, Trash2, Pin, Check } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useWindowManager } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -16,9 +16,9 @@ interface SavedNote {
 export const StickyNoteModal: React.FC = () => {
   const { isStickyNoteOpen, setStickyNoteOpen } = useAtmosphereStore();
   const { windows, closeWindow } = useWindowManager();
-  const { playClick, playPaperRustle } = useSoundEffects();
+  const { playPaperRustle, playClick } = useSoundEffects();
 
-  const isOpen = isStickyNoteOpen || (windows.notes?.isOpen && !windows.notes?.isMinimized);
+  const isOpen = isStickyNoteOpen || windows.notes.isOpen;
 
   const handleClose = () => {
     playClick();
@@ -28,17 +28,16 @@ export const StickyNoteModal: React.FC = () => {
 
   const [author, setAuthor] = useState("");
   const [content, setContent] = useState("");
-  const [savedNotes, setSavedNotes] = useState<SavedNote[]>([]);
+  const [savedNotes, setSavedNotes] = useState<SavedNote[]>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const stored = localStorage.getItem("chirag_desk_sticky_notes");
+        if (stored) return JSON.parse(stored);
+      } catch {}
+    }
+    return [];
+  });
   const [isPinned, setIsPinned] = useState(false);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("chirag_desk_sticky_notes");
-      if (stored) {
-        setSavedNotes(JSON.parse(stored));
-      }
-    } catch {}
-  }, []);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();

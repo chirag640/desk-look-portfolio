@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { projectsData, projectCategories, Project } from "@/data/projects";
 import { Badge } from "@/ui/Badge";
 import { Button } from "@/ui/Button";
-import { FolderGit2, ExternalLink, Box, Star, CheckCircle2, ChevronRight } from "lucide-react";
+import { FolderGit2, ExternalLink, Star, CheckCircle2, ChevronRight } from "lucide-react";
 import { GithubIcon } from "@/ui/BrandIcons";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 

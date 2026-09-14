@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { Terminal, X, Minus, Square, Send, Sparkles, Trophy, Play, RefreshCw, Mail, ExternalLink, FileText } from "lucide-react";
+import { Terminal, X, Minus, Square, Send, Sparkles, Trophy, RefreshCw, Mail, ExternalLink } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useWindowManager } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -511,18 +511,19 @@ const SnakeGameView: React.FC<{ onExit: () => void }> = ({ onExit }) => {
   const [dir, setDir] = useState<{ x: number; y: number }>({ x: 1, y: 0 });
   const [food, setFood] = useState<{ x: number; y: number }>({ x: 14, y: 7 });
   const [score, setScore] = useState(0);
-  const [highScore, setHighScore] = useState(0);
+  const [highScore, setHighScore] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("chirag_snake_highscore");
+        if (saved) return parseInt(saved, 10);
+      } catch {}
+    }
+    return 0;
+  });
   const [gameOver, setGameOver] = useState(false);
 
   const COLS = 24;
   const ROWS = 13;
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("chirag_snake_highscore");
-      if (saved) setHighScore(parseInt(saved, 10));
-    } catch {}
-  }, []);
 
   const spawnFood = useCallback((currentSnake: { x: number; y: number }[]) => {
     let newFood = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };

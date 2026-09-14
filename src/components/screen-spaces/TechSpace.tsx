@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { skillCategoriesData } from "@/data/skills";
-import { Badge } from "@/ui/Badge";
 import { Cpu, Smartphone, Globe, Server, Database, Box, CheckCircle2, Code2 } from "lucide-react";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 
@@ -63,7 +62,7 @@ export const TechSpace: React.FC = () => {
           </div>
 
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
-            <p className="text-slate-500">// Enterprise Clean Architecture Scaffolder</p>
+            <p className="text-slate-500">{"// Enterprise Clean Architecture Scaffolder"}</p>
             <p><span className="text-[#FF7B72]">import</span> <span className="text-[#A5D6FF]">&apos;package:flutter_blueprint/core.dart&apos;</span>;</p>
             <p className="text-[#79C0FF]">class <span className="text-[#FFA657]">BlueprintScaffolder</span> &#123;</p>
             <p className="pl-3 text-slate-400">final StateManagement state = StateManagement.bloc;</p>

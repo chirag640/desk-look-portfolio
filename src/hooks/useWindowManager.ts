@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { useAtmosphereStore } from "./useAtmosphereStore";
+import { useMusicStore } from "./useMusicStore";
 
 export type FinderTab = "about" | "tech" | "projects" | "history" | "resume" | "contact";
 export type WindowId = "finder" | "terminal" | "music" | "notes";
@@ -47,12 +48,12 @@ interface WindowManagerStore {
 
 export const useWindowManager = create<WindowManagerStore>((set, get) => ({
   windows: {
-    finder: { isOpen: true, isMinimized: false, isMaximized: false, zIndex: 10 },
+    finder: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 10 },
     terminal: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 9 },
-    music: { isOpen: true, isMinimized: false, isMaximized: false, zIndex: 8 },
+    music: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 8 },
     notes: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 7 }
   },
-  activeWindow: "finder",
+  activeWindow: null,
   finderTab: "about",
   isControlCenterOpen: false,
   isAppleMenuOpen: false,
@@ -68,6 +69,11 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
       useAtmosphereStore.getState().setTerminalOpen(true);
     } else if (id === "notes") {
       useAtmosphereStore.getState().setStickyNoteOpen(true);
+    } else if (id === "music") {
+      useMusicStore.getState().setPlayerOpen(true);
+      if (useMusicStore.getState().isMinimized) {
+        useMusicStore.getState().toggleMinimize();
+      }
     }
     set({
       windows: {
@@ -87,6 +93,8 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
       useAtmosphereStore.getState().setTerminalOpen(false);
     } else if (id === "notes") {
       useAtmosphereStore.getState().setStickyNoteOpen(false);
+    } else if (id === "music") {
+      useMusicStore.getState().setPlayerOpen(false);
     }
     set({
       windows: {
@@ -103,6 +111,10 @@ export const useWindowManager = create<WindowManagerStore>((set, get) => ({
       useAtmosphereStore.getState().setTerminalOpen(false);
     } else if (id === "notes") {
       useAtmosphereStore.getState().setStickyNoteOpen(false);
+    } else if (id === "music") {
+      if (!useMusicStore.getState().isMinimized) {
+        useMusicStore.getState().toggleMinimize();
+      }
     }
     set({
       windows: {

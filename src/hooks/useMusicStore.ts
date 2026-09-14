@@ -51,6 +51,7 @@ interface MusicStoreState {
   currentTrackTitle: string;
   userHasInteracted: boolean;
   isTapeWarmth: boolean;
+  hasLoadedPlayer: boolean;
   
   // Actions
   togglePlay: () => void;
@@ -65,6 +66,7 @@ interface MusicStoreState {
   toggleTapeWarmth: () => void;
   setCurrentTrackTitle: (title: string) => void;
   setUserHasInteracted: (val: boolean) => void;
+  setHasLoadedPlayer: (val: boolean) => void;
   
   // Player control triggers (subscribed by the player component)
   commandTrigger: {
@@ -80,7 +82,7 @@ interface MusicStoreState {
 export const useMusicStore = create<MusicStoreState>((set, get) => ({
   activePlaylist: "retro_hindi",
   isPlaying: false,
-  isPlayerOpen: true, // Pop appears on startup as requested
+  isPlayerOpen: false, // Starts closed so portfolio opens clean!
   isMinimized: false,
   showVideoDrawer: false,
   volume: 80,
@@ -88,10 +90,11 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   currentTrackTitle: "Vintage Bollywood Classics (70s-90s)",
   userHasInteracted: false,
   isTapeWarmth: false,
+  hasLoadedPlayer: false,
 
   togglePlay: () => {
     const nextState = !get().isPlaying;
-    set({ isPlaying: nextState, userHasInteracted: true });
+    set({ isPlaying: nextState, userHasInteracted: true, hasLoadedPlayer: true });
     if (nextState) {
       get().triggerPlay();
     } else {
@@ -106,6 +109,7 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
       activePlaylist: playlist,
       currentTrackTitle: PLAYLISTS[playlist].name,
       userHasInteracted: true,
+      hasLoadedPlayer: true,
       commandTrigger: { type: "switch", timestamp: Date.now() }
     });
   },
@@ -120,6 +124,7 @@ export const useMusicStore = create<MusicStoreState>((set, get) => ({
   toggleTapeWarmth: () => set((s) => ({ isTapeWarmth: !s.isTapeWarmth })),
   setCurrentTrackTitle: (title) => set({ currentTrackTitle: title }),
   setUserHasInteracted: (val) => set({ userHasInteracted: val }),
+  setHasLoadedPlayer: (val) => set({ hasLoadedPlayer: val }),
 
   commandTrigger: { type: "none", timestamp: 0 },
   triggerPlay: () => set({ commandTrigger: { type: "play", timestamp: Date.now() } }),
