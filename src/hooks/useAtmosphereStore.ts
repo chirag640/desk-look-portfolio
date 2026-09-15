@@ -90,7 +90,7 @@ export const useAtmosphereStore = create<AtmosphereState>((set, get) => ({
   setLightingMood: (mood) => set({ lightingMood: mood, isAutoSkySync: false }),
   wallpaperTheme: "obsidian",
   setWallpaperTheme: (theme) => set({ wallpaperTheme: theme }),
-  cameraView: "screen",
+  cameraView: "desk",
   setCameraView: (view) => set({ cameraView: view }),
   soundscape: "none",
   setSoundscape: (soundscape) => set({ soundscape }),

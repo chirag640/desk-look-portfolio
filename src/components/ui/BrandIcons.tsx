@@ -30,3 +30,17 @@ export const LinkedinIcon: React.FC<{ className?: string }> = ({ className = "w-
     <circle cx="4" cy="4" r="2" />
   </svg>
 );
+
+export const XIcon: React.FC<{ className?: string }> = ({ className = "w-4 h-4" }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 4l16 16m0-16L4 20" />
+  </svg>
+);
