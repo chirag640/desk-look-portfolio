@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Play,
   Pause,
@@ -219,6 +219,7 @@ export const MusicPopWidget: React.FC = () => {
             }}
             className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center text-white transition-all ml-1 cursor-pointer"
             title={isPlaying ? "Pause" : "Play"}
+            aria-label={isPlaying ? "Pause music" : "Play music"}
           >
             {isPlaying ? <Pause className="w-3 h-3 fill-current stroke-current" /> : <Play className="w-3 h-3 fill-current stroke-current ml-0.5" />}
           </button>
@@ -245,6 +246,7 @@ export const MusicPopWidget: React.FC = () => {
                 }}
                 className="w-3 h-3 rounded-full bg-[#EF4444] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
                 title="Close Player"
+                aria-label="Close Music Player"
               >
                 <X className="w-2 h-2 text-black/70" />
               </button>
@@ -255,6 +257,7 @@ export const MusicPopWidget: React.FC = () => {
                 }}
                 className="w-3 h-3 rounded-full bg-[#F59E0B] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
                 title="Minimize to Disc"
+                aria-label="Minimize Music Player"
               >
                 <Minus className="w-2 h-2 text-black/70" />
               </button>

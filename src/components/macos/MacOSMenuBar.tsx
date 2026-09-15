@@ -17,7 +17,6 @@ import {
   Code,
   Briefcase,
   Layers,
-  Terminal,
   FileText,
   Mail
 } from "lucide-react";

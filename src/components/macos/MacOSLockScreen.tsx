@@ -11,8 +11,7 @@ import {
   Sparkles,
   Lock,
   ArrowRight,
-  CornerDownLeft,
-  KeyRound
+  CornerDownLeft
 } from "lucide-react";
 
 export const MacOSLockScreen: React.FC = () => {
@@ -95,7 +94,7 @@ export const MacOSLockScreen: React.FC = () => {
         clearTimeout(idleTimerRef.current);
       }
     };
-  }, [resetIdleTimer, isLocked]);
+  }, [resetIdleTimer, isLocked, lockScreen]);
 
   // Global ⌃⌘Q or Alt+L hotkey to manually lock
   useEffect(() => {

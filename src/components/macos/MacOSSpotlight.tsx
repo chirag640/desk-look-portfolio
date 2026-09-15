@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useWindowManager, FinderTab } from "@/hooks/useWindowManager";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useWindowManager } from "@/hooks/useWindowManager";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useMusicStore } from "@/hooks/useMusicStore";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -16,7 +16,6 @@ import {
   Terminal,
   Disc3,
   Pin,
-  Sparkles,
   Code2,
   Monitor,
   LayoutGrid,
@@ -41,12 +40,11 @@ export const MacOSSpotlight: React.FC = () => {
     closeSpotlight,
     setFinderTab,
     openWindow,
-    toggleWindow,
     toggleMissionControl,
     lockScreen
   } = useWindowManager();
 
-  const { toggleStickyNote, toggleTerminal, setCameraView } = useAtmosphereStore();
+  const { toggleStickyNote, setCameraView } = useAtmosphereStore();
   const { setPlayerOpen } = useMusicStore();
   const { playClick, playMacPop, playMacSwoosh } = useSoundEffects();
 
@@ -311,10 +309,10 @@ export const MacOSSpotlight: React.FC = () => {
     );
   });
 
-  const handleSelect = (item: SpotlightItem) => {
+  const handleSelect = useCallback((item: SpotlightItem) => {
     playMacPop();
     item.action();
-  };
+  }, [playMacPop]);
 
   // Global ⌘K / Ctrl+K, Escape, Arrow Up/Down, and Enter hotkeys
   useEffect(() => {
@@ -349,7 +347,7 @@ export const MacOSSpotlight: React.FC = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSpotlightOpen, closeSpotlight, selectedIndex, filteredItems, playClick]);
+  }, [isSpotlightOpen, closeSpotlight, selectedIndex, filteredItems, playClick, handleSelect]);
 
   if (!isSpotlightOpen) return null;
 

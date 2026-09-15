@@ -6,11 +6,15 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { getAssetPath } from "@/lib/assets";
 
 interface MacWorkstationProps {
   progress: number;
   isMobile?: boolean;
 }
+
+const MODEL_PATH = getAssetPath("/models/macbook-transformed.glb");
+const DRACO_PATH = getAssetPath("/draco/");
 
 // Active space accents matching ChiragOS
 const SPACE_GLOWS = [
@@ -33,7 +37,7 @@ export const MacWorkstation: React.FC<MacWorkstationProps> = ({
   const { playClick, playThock } = useSoundEffects();
 
   // Load the authentic Apple MacBook Pro M3 Max 16-inch model with local Draco WASM decoding
-  const { scene } = useGLTF("/models/macbook-transformed.glb", "/draco/");
+  const { scene } = useGLTF(MODEL_PATH, DRACO_PATH);
 
   const activeSpace = Math.max(0, Math.min(6, Math.round(progress * 6)));
   const glowColor = SPACE_GLOWS[activeSpace];
@@ -91,4 +95,4 @@ export const MacWorkstation: React.FC<MacWorkstationProps> = ({
 };
 
 // Preload model with local Draco WASM decoding
-useGLTF.preload("/models/macbook-transformed.glb", "/draco/");
+useGLTF.preload(MODEL_PATH, DRACO_PATH);

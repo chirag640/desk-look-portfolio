@@ -15,8 +15,6 @@ import {
   Sliders,
   Sparkles,
   Monitor,
-  Check,
-  Disc3,
   Keyboard,
   LayoutGrid,
   Lock,
@@ -38,7 +36,7 @@ export const MacOSControlCenter: React.FC = () => {
     setKeyboardSwitch
   } = useAtmosphereStore();
 
-  const { isTapeWarmth, toggleTapeWarmth, isPlaying, togglePlay } = useMusicStore();
+  const { isTapeWarmth, toggleTapeWarmth } = useMusicStore();
   const { soundEnabled, playClick, playThock } = useSoundEffects();
   const { toggleSound } = useSoundStore();
 

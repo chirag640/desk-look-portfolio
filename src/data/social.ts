@@ -1,3 +1,5 @@
+import { getAssetPath } from "@/lib/assets";
+
 export interface SocialLinks {
   name: string;
   title: string;
@@ -25,8 +27,8 @@ export const personalData: SocialLinks = {
   linkedin: "https://www.linkedin.com/in/chiragchaudhary1910/",
   pubDev: "https://pub.dev/packages/flutter_blueprint",
   email: "chiragchaudhary1910@gmail.com",
-  twitter: "https://github.com/chirag640",
-  resumeUrl: "./resume/Chirag_Resume.pdf",
+  twitter: "https://x.com/chirag640",
+  resumeUrl: getAssetPath("/resume/Chirag_Resume.pdf"),
   location: "Gandhinagar, Gujarat, India",
   status: "Software Engineer at TCS · Open to High-Impact Engineering",
   education: "B.Tech in Computer Science & Engineering"

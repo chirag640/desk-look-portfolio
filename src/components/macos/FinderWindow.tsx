@@ -156,6 +156,7 @@ export const FinderWindow: React.FC = () => {
             }}
             className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] hover:brightness-110 flex items-center justify-center group cursor-pointer transition-transform active:scale-90"
             title="Close Finder"
+            aria-label="Close Finder"
           >
             <span className="opacity-0 group-hover:opacity-100 text-[8px] text-black font-bold leading-none">×</span>
           </button>
@@ -169,6 +170,7 @@ export const FinderWindow: React.FC = () => {
             }}
             className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] hover:brightness-110 flex items-center justify-center group cursor-pointer transition-transform active:scale-90"
             title="Minimize Finder"
+            aria-label="Minimize Finder"
           >
             <span className="opacity-0 group-hover:opacity-100 text-[8px] text-black font-bold leading-none">−</span>
           </button>
@@ -182,6 +184,7 @@ export const FinderWindow: React.FC = () => {
             }}
             className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] hover:brightness-110 flex items-center justify-center group cursor-pointer transition-transform active:scale-90"
             title="Zoom Finder"
+            aria-label="Zoom Finder"
           >
             <span className="opacity-0 group-hover:opacity-100 text-[8px] text-black font-bold leading-none">+</span>
           </button>

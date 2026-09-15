@@ -8,13 +8,10 @@ import {
   Moon,
   CloudRain,
   GitBranch,
-  GitCommit,
   Cpu,
   BatteryCharging,
-  HardDrive,
   ExternalLink,
   MapPin,
-  Sparkles,
   BookOpen
 } from "lucide-react";
 

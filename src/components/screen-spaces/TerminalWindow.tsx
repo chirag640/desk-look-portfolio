@@ -291,6 +291,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
               }}
               className="w-3 h-3 rounded-full bg-[#EF4444] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
               title="Close"
+              aria-label="Close Terminal"
             >
               <X className="w-2 h-2 text-black/70" />
             </button>
@@ -302,6 +303,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
               }}
               className="w-3 h-3 rounded-full bg-[#F59E0B] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
               title="Minimize"
+              aria-label="Minimize Terminal"
             >
               <Minus className="w-2 h-2 text-black/70" />
             </button>
@@ -309,6 +311,7 @@ Overview: CLI generator to scaffold enterprise clean architecture apps in Flutte
               onClick={() => playClick()}
               className="w-3 h-3 rounded-full bg-[#10B981] hover:brightness-125 transition-all flex items-center justify-center cursor-pointer"
               title="Maximize"
+              aria-label="Maximize Terminal"
             >
               <Square className="w-1.5 h-1.5 text-black/70" />
             </button>
@@ -533,7 +536,7 @@ const SnakeGameView: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     return newFood;
   }, [COLS, ROWS]);
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     playClick();
     setSnake([
       { x: 10, y: 7 },
@@ -544,7 +547,7 @@ const SnakeGameView: React.FC<{ onExit: () => void }> = ({ onExit }) => {
     setScore(0);
     setGameOver(false);
     setFood({ x: 15, y: 7 });
-  };
+  }, [playClick]);
 
   // Keyboard controls
   useEffect(() => {
@@ -577,7 +580,7 @@ const SnakeGameView: React.FC<{ onExit: () => void }> = ({ onExit }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dir, gameOver, onExit]);
+  }, [dir, gameOver, onExit, playThock, resetGame]);
 
   // Game Tick Loop
   useEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Sparkles, Trash2, Pin, Check } from "lucide-react";
+import { X, Trash2, Pin, Check, Sparkles } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useWindowManager } from "@/hooks/useWindowManager";
 import { useSoundEffects } from "@/hooks/useSoundEffects";

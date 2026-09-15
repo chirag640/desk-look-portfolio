@@ -6,13 +6,10 @@ import {
   Play,
   GitBranch,
   GitCommit,
-  Star,
   ExternalLink,
   Terminal,
   Cpu,
-  CheckCircle2,
   ArrowLeft,
-  Sparkles,
   RefreshCw
 } from "lucide-react";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";

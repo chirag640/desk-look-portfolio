@@ -19,16 +19,27 @@ export const ContactSpace: React.FC<ContactSpaceProps> = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.message) return;
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
 
     setStatus("submitting");
     playClick();
 
+    const subject = encodeURIComponent(`Portfolio Transmission from ${formData.name.trim()}`);
+    const body = encodeURIComponent(
+      `Hi Chirag,\n\n${formData.message.trim()}\n\n---\nSender: ${formData.name.trim()}\nEmail: ${formData.email.trim()}\nSent via ChiragOS Portfolio Transmission Terminal`
+    );
+    const mailtoUrl = `mailto:${personalData.email}?subject=${subject}&body=${body}`;
+
     setTimeout(() => {
       setStatus("success");
       playWindowOpen();
+      try {
+        window.location.href = mailtoUrl;
+      } catch {
+        // Fallback for strict browser sandbox
+      }
       setFormData({ name: "", email: "", message: "" });
-    }, 900);
+    }, 600);
   };
 
   return (
@@ -62,10 +73,10 @@ export const ContactSpace: React.FC<ContactSpaceProps> = () => {
             <div className="p-8 rounded-2xl bg-[#63C58A15] border border-[#63C58A33] text-center space-y-3">
               <CheckCircle2 className="w-10 h-10 text-[#63C58A] mx-auto animate-bounce" />
               <h4 className="text-lg font-bold text-white">
-                Transmission Received Successfully!
+                Transmission Prepared & Dispatched!
               </h4>
               <p className="text-xs text-slate-300 max-w-sm mx-auto">
-                Thank you for reaching out. Chirag Chaudhary will respond to your transmission as soon as possible.
+                Your transmission has been formatted and targeted to Chirag Chaudhary (<code className="text-[#5B8DEF]">{personalData.email}</code>).
               </p>
               <Button
                 size="sm"

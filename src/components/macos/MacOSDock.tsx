@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useWindowManager, FinderTab } from "@/hooks/useWindowManager";
+import { useWindowManager } from "@/hooks/useWindowManager";
 import { useAtmosphereStore } from "@/hooks/useAtmosphereStore";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import {
@@ -13,8 +13,7 @@ import {
   Pin,
   Mail,
   Monitor,
-  LayoutGrid,
-  Code
+  LayoutGrid
 } from "lucide-react";
 
 type DockAction = "finder" | "tech" | "projects" | "terminal" | "music" | "notes" | "contact" | "mission" | "desk";

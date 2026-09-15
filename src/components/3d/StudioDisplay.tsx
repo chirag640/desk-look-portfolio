@@ -65,7 +65,7 @@ export const StudioDisplay: React.FC<StudioDisplayProps> = ({
 
   const { isPlaying: isMusicPlaying, togglePlay: toggleMusicPlay, setPlayerOpen } =
     useMusicStore();
-  const { playClick, playThock, playMug, playPaperRustle } = useSoundEffects();
+  const { playThock, playMug, playPaperRustle } = useSoundEffects();
 
   const [steamPuff, setSteamPuff] = useState(0);
 

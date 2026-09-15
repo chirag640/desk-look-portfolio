@@ -34,7 +34,7 @@ export const MacOSMissionControl: React.FC = () => {
     finderTab
   } = useWindowManager();
 
-  const { playMacSwoosh, playMacPop, playClick } = useSoundEffects();
+  const { playMacSwoosh, playMacPop } = useSoundEffects();
 
   // Listen for F3, ⌘Tab / Ctrl+Tab, and Escape hotkeys
   useEffect(() => {
